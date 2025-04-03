@@ -1,5 +1,5 @@
 import flask as f
-from flask_bootstrap import Bootstrap5 
+from flask_bootstrap import Bootstrap5
 
 
 app = f.Flask('__name__')

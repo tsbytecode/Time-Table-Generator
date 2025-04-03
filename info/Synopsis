@@ -11,11 +11,11 @@ The Timetable Generator App is an innovative solution designed to simplify the s
 1. User-Friendly Interface: An intuitive design ensures that users can easily navigate the app, making timetable creation simple and quick.
 2. Customizable Timetable: Users can input their subjects, class timings, and extracurricular activities. The app intelligently organizes this information to generate a cohesive timetable that fits their lifestyle.
 3. Conflict Resolution: The app automatically detects and resolves scheduling conflicts, ensuring that users are not double-booked and can manage their time effectively.
-4. Reminder Alerts: Built-in notifications keep users informed of upcoming classes and important events, helping them stay on track with their studies.
-5. Multi-Device Sync: Timetables are automatically synced across devices, allowing users to access their schedules anytime, anywhere.
+4. Ability to schedule auxiliary tasks: Non-teaching tasks such as lunch duty or administrative tasks can be automatically scheduled.
+5. Offline capability: Users can access their schedules without the internet connectivity.
 6. Sharing Options: Students can easily share their timetables with classmates or family members, promoting collaboration and study group organization.
 
-By integrating these features, the Timetable Generator App aims to enhance the academic experience, reduce stress associated with planning, and enable users to focus more on their studies. 
+By integrating these features, the Timetable Generator App aims to reduce stress associated with planning and enable users to have a punctual life. 
 
 Hardware requirements:
 1. 2GB disc space

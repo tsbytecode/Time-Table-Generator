@@ -4,3 +4,8 @@ python :
 
 builtin :
 + os
+
+installs:
+pip installs :
+flask
+bootstrap-flask

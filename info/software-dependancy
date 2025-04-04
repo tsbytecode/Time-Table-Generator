@@ -1,0 +1,6 @@
+python :
++ flask, jinja2,click,blinker as (flask)
++ bootstrap-flask
+
+builtin :
++ os

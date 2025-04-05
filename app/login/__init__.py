@@ -1,4 +1,5 @@
 from flask import Blueprint
 
-bp = Blueprint('login', __name__)
+loginbp = Blueprint('login', __name__,url_prefix='/login')
 
+from . import login

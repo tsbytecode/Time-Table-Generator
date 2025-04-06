@@ -1,11 +1,14 @@
 python :
-+ flask, jinja2,click,blinker as (flask)
++ flask, jinja2, click, blinker as (flask)
 + bootstrap-flask
++ wtf 
 
 builtin :
 + os
 
-installs:
 pip installs :
 flask
 bootstrap-flask
+Flask-wtf
+email_validator
+Flask-SQLalchemy

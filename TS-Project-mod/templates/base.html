@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Timetable App{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1C1B23;
+            color: #F2DFCB;
+            overflow-x: hidden;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #28272E;
+            color: #F2DFCB;
+            padding: 10px 0;
+            border-right: 1px solid #44434A;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 10;
+            transition: transform 0.3s ease-in-out;
+            transform: translateX(-250px);
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            font-family: "Times New Roman", Times, serif;
+            font-weight: bold;
+            text-align: center;
+            padding: 0 5px;
+            word-break: break-word;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #F2DFCB;
+            text-decoration: none;
+            padding: 10px 5px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            word-break: break-word;
+            font-size: 0.9em;
+        }
+
+        .sidebar a:hover {
+            background-color: #31303A;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+
+        .menu-toggle {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: none;
+            border: none;
+            color: #F2DFCB;
+            font-size: 1.5em;
+            cursor: pointer;
+            z-index: 11;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9;
+            display: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .overlay.open {
+            display: block;
+            opacity: 1;
+        }
+
+        .header-container {
+            background-color: #28272E;
+            border: 4px solid #44434A;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            padding-top: 40px;
+        }
+
+        .main-header {
+            background-color: #31303A;
+            color: #F2DFCB;
+            padding: 0.01em 2.5em;
+            text-align: center;
+            margin-bottom: 0;
+            font-family: "Times New Roman", Times, serif;
+            font-weight: bold;
+            letter-spacing: 0.06em;
+            font-size: 1.3em;
+        }
+
+        .secondary-header {
+            background-color: #31303A;
+            color: #F2DFCB;
+            padding: 0.27em 2.5em;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 0;
+            border-top: 1px solid #44434A;
+        }
+
+        .user-info {
+            color: #F2DFCB;
+            font-size: 0.9em;
+        }
+
+        .user-info a {
+            color: #F2DFCB;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 0.8em;
+        }
+
+        .user-info > a:first-of-type {
+            margin-left: 1.2em;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3em;
+            padding: 1.2em;
+            background-color: #31303A;
+            color: #F2DFCB;
+            border-radius: 8px;
+            box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.4);
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+    <button class="menu-toggle">&#8942;</button>
+    <div class="sidebar">
+        <h2>Timetable App</h2>
+        <ul>
+            <li><a href="{{ url_for('create_timetable') }}">Create/Edit</a></li>
+            <li><a href="{{ url_for('view_timetable') }}">View Timetable</a></li>
+            <li><a href="{{ url_for('import_export') }}">Export/Import</a></li>
+        </ul>
+        <br>
+        {% if session['user'] %}
+            <p class="user-info">Logged in as: {{ session['user'] }}</p>
+            <p class="user-info"><a href="{{ url_for('logout') }}">Logout</a></p>
+        {% else %}
+            <p class="user-info"><a href="{{ url_for('login') }}">Login</a></p>
+        {% endif %}
+    </div>
+    <div class="content">
+        <div class="header-container">
+            <header class="main-header">
+                <h1>Timetable Generator</h1>
+            </header>
+        </div>
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+        <footer>
+            <p>Timetable App by Tushar, Darshan and Raj</p>
+        </footer>
+    </div>
+    <div class="overlay"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const content = document.querySelector('.content');
+            const overlay = document.querySelector('.overlay');
+
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('open');
+            });
+
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('open');
+            });
+        });
+    </script>
+</body>
+</html>

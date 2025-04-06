@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}View Timetable{% endblock %}
+
+{% block content %}
+    <h2>Timetable</h2>
+    {% if timetable_data %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    {% for day in days_order %}
+                        <th>{{ day }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for time, days in timetable_data.items()|sort %}
+                    <tr>
+                        <td>{{ time }}</td>
+                        {% for day in days_order %}
+                            <td>{{ days.get(day, '') }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p><a href="{{ url_for('create_timetable') }}">Edit Timetable</a> | <a href="{{ url_for('export_timetable') }}">Export as CSV</a> | <a href="{{ url_for('import_timetable') }}">Import CSV</a></p>
+    {% else %}
+        <p>No timetable entries yet. <a href="{{ url_for('create_timetable') }}">Create one</a> | <a href="{{ url_for('import_timetable') }}">Import CSV</a>.</p>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,222 @@
+/* --- Dark Theme with Extremely Minimal Header Padding (Internet-Free Fonts) --- */
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* Modern, readable sans-serif */
+    margin: 20px;
+    background-color: #1C1B23;
+    color: #F2DFCB;
+    line-height: 1.7;
+}
+
+.header-container {
+    background-color: #28272E;
+    border: 4px solid #44434A;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.main-header {
+    background-color: #31303A;
+    color: #F2DFCB;
+    padding: 0.01em 2.5em; /* Extremely minimal vertical padding */
+    text-align: center;
+    margin-bottom: 0;
+    font-family: "Times New Roman", Times, serif; /* Classic, widely available serif */
+    font-weight: bold; /* Using bold as a substitute for different weights */
+    letter-spacing: 0.06em;
+    font-size: 1.3em; /* Slightly adjusted size for the new font */
+}
+
+.secondary-header {
+    background-color: #31303A;
+    color: #F2DFCB;
+    padding: 0.27em 2.5em;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 0;
+    border-top: 1px solid #44434A;
+}
+
+.user-info {
+    color: #F2DFCB;
+    font-size: 0.9em; /* Adjusted size */
+}
+
+.user-info a {
+    color: #F2DFCB;
+    text-decoration: none;
+    font-weight: bold;
+    margin-left: 0.8em;
+}
+
+/* Space between Welcome and Logout */
+.user-info > a:first-of-type {
+    margin-left: 1.2em;
+}
+
+main {
+    background-color: #28272E;
+    color: #F2DFCB;
+    padding: 1.5em;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+h2 {
+    color: #F2DFCB;
+    margin-bottom: 1.2em;
+    border-bottom-color: #44434A;
+    font-family: "Times New Roman", Times, serif;
+    font-weight: normal; /* Using normal weight for subheadings */
+    font-size: 1.6em; /* Adjusted size */
+}
+
+form div {
+    margin-bottom: 1.5em;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5em;
+    font-weight: bold;
+    color: #D1C4B3;
+    font-size: 0.9em;
+}
+
+input[type="text"],
+input[type="password"],
+select {
+    width: calc(100% - 10px);
+    padding: 8px;
+    border: 1px solid #44434A;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: #31303A;
+    color: #F2DFCB;
+    font-size: 0.8em;
+}
+
+button {
+    background-color: #31303A;
+    color: #F2DFCB;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #44434A;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 2em;
+    border-color: #44434A;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th {
+    background-color: #31303A;
+    color: #F2DFCB;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+    text-align: left;
+    padding: 0.8em;
+    font-size: 0.9em;
+}
+
+td {
+    border-color: #44434A;
+    padding: 0.8em;
+    text-align: left;
+    color: #F2DFCB;
+    font-size: 0.8em;
+}
+
+tr:nth-child(even) {
+    background-color: #38373E;
+}
+
+footer {
+    text-align: center;
+    margin-top: 3em;
+    padding: 1.2em;
+    background-color: #31303A;
+    color: #F2DFCB;
+    border-radius: 8px;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.4);
+    font-size: 0.85em;
+}
+
+/* Styles for the dynamic timetable form */
+.timetable-entry {
+    border: 1px solid #44434A;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    display: grid;
+    grid-template-columns: 1fr; /* Single column layout */
+    gap: 10px; /* Increased row gap */
+    align-items: start; /* Align items to the start of the grid cell */
+}
+
+.timetable-entry label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+    grid-column: 1; /* Ensure label is in the first column */
+}
+
+.timetable-entry select,
+.timetable-entry input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background-color: #31303A;
+    color: #F2DFCB;
+    box-sizing: border-box;
+    font-size: 0.9em;
+    grid-column: 1; /* Ensure input/select is in the first column */
+}
+
+.timetable-entry button.remove-slot {
+    background-color: #d32f2f;
+    color: #F2DFCB;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+    grid-column: 1; /* Button in the first column */
+    margin-top: 10px;
+    width: auto; /* Adjust button width */
+}
+
+.timetable-entry button.remove-slot:hover {
+    background-color: #b71c1c;
+}
+
+#add-slot,
+#timetable-form button[type="submit"] {
+    background-color: #3f51b5;
+    color: #F2DFCB;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    margin-top: 15px;
+    margin-right: 10px;
+}
+
+#add-slot:hover,
+#timetable-form button[type="submit"]:hover {
+    background-color: #283593;
+}

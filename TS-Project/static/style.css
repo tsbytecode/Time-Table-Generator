@@ -1,6 +1,5 @@
-/* --- Dark Theme with Extremely Minimal Header Padding (Internet-Free Fonts) --- */
 body {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* Modern, readable sans-serif */
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     margin: 20px;
     background-color: #1C1B23;
     color: #F2DFCB;
@@ -18,13 +17,13 @@ body {
 .main-header {
     background-color: #31303A;
     color: #F2DFCB;
-    padding: 0.01em 2.5em; /* Extremely minimal vertical padding */
+    padding: 0.01em 2.5em;
     text-align: center;
     margin-bottom: 0;
-    font-family: "Times New Roman", Times, serif; /* Classic, widely available serif */
-    font-weight: bold; /* Using bold as a substitute for different weights */
+    font-family: "Times New Roman", Times, serif;
+    font-weight: bold;
     letter-spacing: 0.06em;
-    font-size: 1.3em; /* Slightly adjusted size for the new font */
+    font-size: 1.3em;
 }
 
 .secondary-header {
@@ -40,7 +39,7 @@ body {
 
 .user-info {
     color: #F2DFCB;
-    font-size: 0.9em; /* Adjusted size */
+    font-size: 0.9em;
 }
 
 .user-info a {
@@ -50,7 +49,6 @@ body {
     margin-left: 0.8em;
 }
 
-/* Space between Welcome and Logout */
 .user-info > a:first-of-type {
     margin-left: 1.2em;
 }
@@ -68,8 +66,8 @@ h2 {
     margin-bottom: 1.2em;
     border-bottom-color: #44434A;
     font-family: "Times New Roman", Times, serif;
-    font-weight: normal; /* Using normal weight for subheadings */
-    font-size: 1.6em; /* Adjusted size */
+    font-weight: normal;
+    font-size: 1.6em;
 }
 
 form div {
@@ -154,23 +152,22 @@ footer {
     font-size: 0.85em;
 }
 
-/* Styles for the dynamic timetable form */
 .timetable-entry {
     border: 1px solid #44434A;
     padding: 15px;
     margin-bottom: 10px;
     border-radius: 6px;
     display: grid;
-    grid-template-columns: 1fr; /* Single column layout */
-    gap: 10px; /* Increased row gap */
-    align-items: start; /* Align items to the start of the grid cell */
+    grid-template-columns: 1fr;
+    gap: 10px;
+    align-items: start;
 }
 
 .timetable-entry label {
     display: block;
     margin-bottom: 5px;
     font-size: 0.9em;
-    grid-column: 1; /* Ensure label is in the first column */
+    grid-column: 1;
 }
 
 .timetable-entry select,
@@ -183,7 +180,7 @@ footer {
     color: #F2DFCB;
     box-sizing: border-box;
     font-size: 0.9em;
-    grid-column: 1; /* Ensure input/select is in the first column */
+    grid-column: 1;
 }
 
 .timetable-entry button.remove-slot {
@@ -194,9 +191,9 @@ footer {
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.8em;
-    grid-column: 1; /* Button in the first column */
+    grid-column: 1;
     margin-top: 10px;
-    width: auto; /* Adjust button width */
+    width: auto;
 }
 
 .timetable-entry button.remove-slot:hover {

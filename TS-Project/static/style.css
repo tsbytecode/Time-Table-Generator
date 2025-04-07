@@ -245,7 +245,7 @@ footer {
 }
 
 .sidebar h2 {
-    margin-top: 8px;
+    margin-top: 5px;
     margin-bottom: 20px;
     font-size: 1.5em;
     font-family: "Times New Roman", Times, serif;
@@ -258,7 +258,7 @@ footer {
 .sidebar ul {
     list-style: none;
     padding: 0px;
-    margin: 0;
+    margin: 20px;
 }
 
 .sidebar li {

@@ -10,9 +10,9 @@
     <div class="sidebar">
         <h2>Timetable App</h2>
         <ul>
-            <li><a href="{{ url_for('create_timetable') }}">______ Create/Edit</a></li>
-            <li><a href="{{ url_for('view_timetable') }}">______ View Timetable</a></li>
-            <li><a href="{{ url_for('import_export') }}">______ Export/Import</a></li>
+            <li><a href="{{ url_for('create_timetable') }}">Create/Edit</a></li>
+            <li><a href="{{ url_for('view_timetable') }}">View Timetable</a></li>
+            <li><a href="{{ url_for('import_export') }}">Export/Import</a></li>
         </ul>
         <br>
         {% if session['user'] %}

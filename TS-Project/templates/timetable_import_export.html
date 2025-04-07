@@ -6,7 +6,9 @@
     <h2>Export/Import Timetable</h2>
 
     <h3>Export Timetable</h3>
-    <p><a href="{{ url_for('export_timetable') }}">Download Timetable as CSV</a></p>
+    <form method="GET" action="{{ url_for('export_timetable') }}">
+        <button type="submit">Download Timetable as CSV</button>
+    </form>
 
     <hr>
 

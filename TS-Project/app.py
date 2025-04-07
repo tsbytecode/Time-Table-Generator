@@ -5,7 +5,7 @@
 import flask as f
 import csv
 import datetime
-from io import StringIO
+from io import StringIO, BytesIO
 
 app = f.Flask(__name__)
 app.secret_key = 'blah'
@@ -138,17 +138,17 @@ def export_timetable():
         return "No timetable data to export."
 
     si = StringIO()
-    cw = csv.writer(si)
-    cw.writerow(['Day', 'Time Slot', 'Subject', 'Teacher'])  # Write header
+    writer = csv.writer(si)
+    writer.writerow(['Day', 'Time Slot', 'Subject', 'Teacher'])
 
     for entry in timetable_data:
-        cw.writerow([entry['day'], entry['time'], entry['subject'], entry['teacher']])
+        writer.writerow([entry['day'], entry['time'], entry['subject'], entry['teacher']])
 
-    output = si.getvalue()
-    si.seek(0)
+    output = si.getvalue().encode("utf-8")
+    bio = BytesIO(output)
+    bio.seek(0)
 
-    return f.send_file(si, mimetype='text/csv', as_attachment=True, download_name=f'timetable{time_to_save}.csv')
-
+    return f.send_file(bio, mimetype='text/csv', as_attachment=True, download_name='timetable.csv')
 #-----------------------------------------------------------------------------------------------------------------------------------
 
 #Import and export control
@@ -195,6 +195,11 @@ def import_timetable():
     else:
         return "Please upload a CSV file."
     
+@app.route('/timetable/import')
+def timetable_import():
+    if 'user' not in f.session:
+        return f.redirect(f.url_for('login'))
+    return f.render_template('timetable_import.html')
 
 #=====================================================================================================================================
 #App run

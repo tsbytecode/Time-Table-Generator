@@ -10,6 +10,15 @@ body {
     line-height: 1.7;
 }
 
+.header-container {
+    background-color: #28272E;
+    border: 4px solid #44434A;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    padding-top: 0px;
+}
+
 .main-header {
     background-color: #28272E;
     color: #F2DFCB;
@@ -303,13 +312,4 @@ footer {
 .overlay.open {
     display: block;
     opacity: 1;
-}
-
-.header-container {
-    background-color: #28272E;
-    border: 4px solid #44434A;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    overflow: hidden;
-    padding-top: 0px;
 }

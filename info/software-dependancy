@@ -9,6 +9,6 @@ builtin :
 pip installs :
 flask
 bootstrap-flask
-Flask-wtf
+Flask-WTF
 email_validator
 Flask-SQLalchemy

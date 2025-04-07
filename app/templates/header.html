@@ -7,7 +7,7 @@
     {{ bootstrap.load_css() }}
     <style>
         body {
-            background-color: #343a40; /* Dark background */
+            background-color:rgb(55, 48, 77); /* Dark background */
             color: white;
             display: flex;
             flex-direction: column;
@@ -18,15 +18,17 @@
         .navbar {
             background-color: #212529; /* Darker navbar */
             color: white;
-            display: flex;
-            justify-content: center;
+            display: flex; /* Add flexbox to navbar */
+            justify-content: center; /* Center content horizontally */
         }
 
         .navbar-brand {
-            font-size: 2rem; /* Make the title larger */
+            margin: auto;
+            font-size: 50px; /* Make the title larger */
             text-align: center; /* Center the title */
             width: auto; /* Allow the title to take only its necessary width */
             display: block;
+            
         }
 
         .content {

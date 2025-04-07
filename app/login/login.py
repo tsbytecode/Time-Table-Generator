@@ -6,6 +6,8 @@ from . import loginbp
 # Dummy user data (replace with a database in a real application)
 users = {}
 
+
+
 class RegistrationForm(fw.FlaskForm):
     username = w.StringField('Username', validators=[w.validators.DataRequired()])
     email = w.StringField('Email', validators=[w.validators.DataRequired(), w.validators.Email()])

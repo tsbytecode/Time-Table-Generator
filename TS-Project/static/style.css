@@ -1,29 +1,26 @@
 body {
+    min-height: 100vh;
+    padding-left: 45px;
+    margin: 0px;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    margin: 20px;
     background-color: #1C1B23;
     color: #F2DFCB;
+    overflow-x: hidden;
+    display: flex;
     line-height: 1.7;
 }
 
-.header-container {
-    background-color: #28272E;
-    border: 4px solid #44434A;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    overflow: hidden;
-}
-
 .main-header {
-    background-color: #31303A;
+    background-color: #28272E;
     color: #F2DFCB;
-    padding: 0.01em 2.5em;
+    padding: 0em 2.5em;
     text-align: center;
     margin-bottom: 0;
     font-family: "Times New Roman", Times, serif;
     font-weight: bold;
     letter-spacing: 0.06em;
     font-size: 1.3em;
+    line-height: 20px;
 }
 
 .secondary-header {
@@ -216,4 +213,103 @@ footer {
 #add-slot:hover,
 #timetable-form button[type="submit"]:hover {
     background-color: #283593;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #31303A;
+    color: #F2DFCB;
+    padding: 10px 0;
+    border-right: 0px solid #44434A;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 10;
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(-203px);
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.sidebar.open {
+    transform: translateX(0);
+}
+
+.sidebar h2 {
+    margin-top: 8px;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    font-family: "Times New Roman", Times, serif;
+    font-weight: bold;
+    text-align: center;
+    padding: 0 5px;
+    word-break: break-word;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0px;
+    margin: 0;
+}
+
+.sidebar li {
+    margin-bottom: 10px;
+}
+
+.sidebar a {
+    display: block;
+    color: #F2DFCB;
+    text-decoration: none;
+    padding: 10px 5px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    word-break: break-word;
+    font-size: 1em;
+}
+
+.sidebar a:hover {
+    background-color: #31303A;
+}
+
+.content {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+.menu-toggle {
+    position: fixed;
+    top: 15px;
+    left: 5px;
+    background: none;
+    border: none;
+    color: #F2DFCB;
+    font-size: 1.5em;
+    cursor: pointer;
+    z-index: 11;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9;
+    display: none;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.overlay.open {
+    display: block;
+    opacity: 1;
+}
+
+.header-container {
+    background-color: #28272E;
+    border: 4px solid #44434A;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    padding-top: 0px;
 }

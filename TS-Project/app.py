@@ -6,34 +6,40 @@ import flask as f
 import csv
 import datetime
 from io import StringIO, BytesIO
+import os
 
 app = f.Flask(__name__)
 app.secret_key = 'blah'
 
 #=====================================================================================================================================
-#Converting date and time from import to version to save as export names for csv
-#=====================================================================================================================================
-
-exact_time = datetime.datetime.now()
-time_to_save = ""
-for i, j in enumerate(str(exact_time)):
-    if i >= 20:
-        break
-    else:    
-        if j in " -.:":
-            continue
-        else:
-            time_to_save += j
-
-
-#=====================================================================================================================================
 #Sample accounts data
 #=====================================================================================================================================
-users = {
-    'user1': {'password': 'pass1'},
-    'user2': {'password': 'pass2'}
-        }
 
+CSV_FILENAME = 'users.csv'
+users = {}
+reset_tokens = {}
+
+def load_users_from_csv():
+    users.clear()
+    try:
+        with open(CSV_FILENAME, 'r', newline='') as csvfile:
+            reader = csv.reader(csvfile)
+            next(reader, None)  # Skip the header row if it exists
+            for row in reader:
+                if len(row) == 2:
+                    username, password = row
+                    users[username] = password
+    except FileNotFoundError:
+        pass  # It's okay if the file doesn't exist yet
+
+def save_user_to_csv(username, password):
+    with open(CSV_FILENAME, 'a', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        if not os.path.exists(CSV_FILENAME) or os.path.getsize(CSV_FILENAME) == 0:
+            writer.writerow(['username', 'password'])  # Write header if the file is new or empty
+        writer.writerow([username, password])
+
+load_users_from_csv()  # Load users when the application starts
 
 #=====================================================================================================================================
 #Main pages
@@ -41,23 +47,98 @@ users = {
 
 #Home page --> Login page
 
-@app.route('/')
-def index():
-    return f.redirect(f.url_for('login'))
-
+@app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if f.request.method == 'POST':
         username = f.request.form['username']
         password = f.request.form['password']
-        user = users.get(username)
-        if user and user['password'] == password:
-            f.session['user'] = username
-            return f.redirect(f.url_for('create_timetable'))
+        if username in users:
+            if users[username] == password:
+                f.session['user'] = username
+                return f.redirect(f.url_for('create_timetable'))
+            else:
+                error = "Incorrect password."  # Specific error for wrong password
+                return f.render_template('login.html', login_error=error)
         else:
-            error = 'Invalid username or password'
-            return f.render_template('login.html', error=error)
+            error = "User does not exist."  # Specific error for non-existent user
+            return f.render_template('login.html', login_error=error)
     return f.render_template('login.html')
+
+#-----------------------------------------------------------------------------------------------------------------------------------
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if f.request.method == 'POST':
+        new_username = f.request.form['new_username']
+        new_password = f.request.form['new_password']
+        confirm_password = f.request.form['confirm_password']
+
+        if new_username in users:
+            error = "Username already exists."
+            return f.render_template('register.html', register_error=error)
+        elif new_password != confirm_password:
+            error = "Passwords do not match."
+            return f.render_template('register.html', register_error=error)
+        elif len(new_password) < 6:
+            error = "Password must be at least 6 characters long."
+            return f.render_template('register.html', register_error=error)
+        else:
+            users[new_username] = new_password
+            save_user_to_csv(new_username, new_password)  # Save the new user to CSV
+            f.session['user'] = new_username
+            return f.redirect(f.url_for('create_timetable'))
+    return f.render_template('register.html')
+
+@app.route('/forgot_password', methods=['GET', 'POST'])
+def forgot_password():
+    if f.request.method == 'POST':
+        email = f.request.form['email']
+        # In this simplified example, we'll use the username as a proxy for email for demonstration
+        if email in users:
+            # Generate a simple reset token (insecure in real app!)
+            token = os.urandom(16).hex()
+            reset_tokens[token] = email
+            message = f"A password reset link has been sent to the (simulated) email address: {email}. The link is: {f.url_for('reset_password', token=token, _external=True)}"
+            return f.render_template('forgot_password.html', forgot_password_message=message)
+        else:
+            error = "Username (as email proxy) not found."
+            return f.render_template('forgot_password.html', forgot_password_error=error)
+    return f.render_template('forgot_password.html')
+
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if token not in reset_tokens:
+        return f.render_template('message.html', message="Invalid or expired reset link.")
+
+    email = reset_tokens[token]
+
+    if f.request.method == 'POST':
+        new_password = f.request.form['new_password']
+        confirm_password = f.request.form['confirm_password']
+
+        if new_password != confirm_password:
+            return f.render_template('reset_password_form.html', token=token, error="Passwords do not match.")
+        elif len(new_password) < 6:
+            return f.render_template('reset_password_form.html', token=token, error="Password must be at least 6 characters long.")
+        else:
+            # In this simplified example, we'll use the username as the key
+            for username, stored_email in users.items():
+                if stored_email == email:
+                    users[username] = new_password # Reset the password (insecure in real app!)
+                    save_all_users_to_csv()
+                    del reset_tokens[token]
+                    return f.redirect(f.url_for('login'))
+            return f.render_template('message.html', message="Password reset successful. You can now log in.")
+
+    return f.render_template('reset_password_form.html', token=token)
+
+def save_all_users_to_csv():
+    with open(CSV_FILENAME, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['username', 'password'])  # Write header
+        for username, password in users.items():
+            writer.writerow([username, password])
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 

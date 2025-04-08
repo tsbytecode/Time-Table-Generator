@@ -1,19 +1,48 @@
 {% extends 'base.html' %}
-{% block title %}Login{% endblock %}
+{% block title %}Login / Register{% endblock %}
 {% block content %}
     <h2>Login</h2>
-    {% if error %}
-        <p style="color: red;">{{ error }}</p>
+    {% if login_error %}
+        <p style="color: red;">{{ login_error }}</p>
     {% endif %}
-    <form method="POST">
+    <form method="POST" action="{{ url_for('login') }}">
         <div>
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required>
         </div>
-        <div>
+        <div class="password-input-container">
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
+            <img src="{{ url_for('static', filename='eye-closed.png') }}" alt="Show Password" class="toggle-password-img" id="togglePasswordLoginImg">
+
         </div>
         <button type="submit">Login</button>
     </form>
+
+    <hr>
+
+    <h2>Don't have an account?</h2>
+    <p><a href="{{ url_for('register') }}">Register here</a></p>
+
+    <h2>Forgot your password?</h2>
+    <p><a href="{{ url_for('forgot_password') }}">Forgot Password</a></p>
+    
+    <script>
+        const passwordInputLogin = document.getElementById('password');
+        const togglePasswordLoginImg = document.getElementById('togglePasswordLoginImg');
+        const closedEyeSrcLogin = "{{ url_for('static', filename='eye_closed.png') }}";
+        const openEyeSrcLogin = "{{ url_for('static', filename='eye_open.png') }}";
+
+        togglePasswordLoginImg.addEventListener('click', function() {
+            const type = passwordInputLogin.getAttribute('type');
+            if (type === 'password') {
+                passwordInputLogin.setAttribute('type', 'text');
+                this.src = openEyeSrcLogin;
+            } else {
+                passwordInputLogin.setAttribute('type', 'password');
+                this.src = closedEyeSrcLogin;
+            }
+        });
+    </script>
+
 {% endblock %}

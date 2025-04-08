@@ -13,20 +13,20 @@
         <div class="password-input-container">
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
-            <img src="{{ url_for('static', filename='eye-closed.png') }}" alt="Show Password" class="toggle-password-img" id="togglePasswordLoginImg">
+            <img src="{{ url_for('static', filename='eye_closed.png') }}" alt="Show Password" class="toggle-password-img" id="togglePasswordLoginImg">
 
         </div>
         <button type="submit">Login</button>
     </form>
+    <br>
+    <form method="GET" action="{{ url_for('register') }}">
+        <button type="submit">Register Here</button>
+    </form>
+   
+    <form method="GET" action="{{ url_for('forgot_password') }}">
+        <button type="submit">Forgot Password</button>
+    </form>
 
-    <hr>
-
-    <h2>Don't have an account?</h2>
-    <p><a href="{{ url_for('register') }}">Register here</a></p>
-
-    <h2>Forgot your password?</h2>
-    <p><a href="{{ url_for('forgot_password') }}">Forgot Password</a></p>
-    
     <script>
         const passwordInputLogin = document.getElementById('password');
         const togglePasswordLoginImg = document.getElementById('togglePasswordLoginImg');

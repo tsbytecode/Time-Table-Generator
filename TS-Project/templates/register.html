@@ -22,7 +22,10 @@
         </div>
         <button type="submit">Register</button>
     </form>
-    <p><a href="{{ url_for('login') }}">Back to Login</a></p>
+    <br>
+    <form method="GET" action="{{ url_for('login') }}">
+        <button type="submit">Back to Login</button>
+    </form>
     <script>
         const newPasswordInputRegister = document.getElementById('new_password');
         const togglePasswordRegisterNewImg = document.getElementById('togglePasswordRegisterNewImg');

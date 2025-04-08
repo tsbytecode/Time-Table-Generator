@@ -27,6 +27,13 @@
         </table>
         <p><a href="{{ url_for('create_timetable') }}">Edit Timetable</a> | <a href="{{ url_for('export_timetable') }}">Export as CSV</a> | <a href="{{ url_for('import_timetable') }}">Import CSV</a></p>
     {% else %}
-        <p>No timetable entries yet. <a href="{{ url_for('create_timetable') }}">Create one</a> | <a href="{{ url_for('import_timetable') }}">Import CSV</a>.</p>
+        <h4 style="display: inline-block; margin-right: 20px;">No timetable entries yet.</h4>
+        <form method="GET" action="{{ url_for('create_timetable') }}" style="display: inline-block;">
+        <button type="submit">Create Timetable</button>
+        </form>
+        <h4 style="display: inline-block; margin-right: 5px;"></h4>
+        <form method="GET" action="{{ url_for('import_timetable') }}" style="display: inline-block;">
+        <button type="submit">Import CSV</button>
+    </form>
     {% endif %}
 {% endblock %}

@@ -8,18 +8,26 @@
 <body>
     <button class="menu-toggle">&#8942;</button>
     <div class="sidebar">
-        <h2>Timetable App</h2>
-        <ul>
-            <li><a href="{{ url_for('create_timetable') }}">Create/Edit</a></li>
-            <li><a href="{{ url_for('view_timetable') }}">View Timetable</a></li>
-            <li><a href="{{ url_for('import_export') }}">Export/Import</a></li>
-        </ul>
+        <h2 style="font-size: 24px;">Timetable App</h2>
+            <form method="GET" action="{{ url_for('create_timetable') }}" style="font-size: 20px; margin-left: 25px; margin-top: 20px;">
+                <button type="submit">Create/Edit</button>
+            </form>
+            <form method="GET" action="{{ url_for('view_timetable') }}" style="font-size: 20px; margin-left: 25px; margin-top: 20px;">
+                <button type="submit">View Timetable</button>
+            </form>
+            <form method="GET" action="{{ url_for('import_export') }}" style="font-size: 20px; margin-left: 25px; margin-top: 20px;">
+                <button type="submit">Export/Import</button>
+            </form>
         <br>
         {% if session['user'] %}
             <p class="user-info">Logged in as: {{ session['user'] }}</p>
-            <p class="user-info"><a href="{{ url_for('logout') }}">Logout</a></p>
+            <form method="GET" action="{{ url_for('logout') }}" style="margin-left: 10px;">
+                <button type="submit">Logout</button>
+            </form>
         {% else %}
-            <p class="user-info"><a href="{{ url_for('login') }}">Login</a></p>
+            <form method="GET" action="{{ url_for('login') }}" style="margin-left: 10px;">
+                <button type="submit">Login</button>
+            </form>
         {% endif %}
     </div>
     <div class="content">

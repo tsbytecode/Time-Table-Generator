@@ -7,5 +7,4 @@ builtin :
 + os
 
 pip installs :
-flask
-Flask-WTF
++ flask

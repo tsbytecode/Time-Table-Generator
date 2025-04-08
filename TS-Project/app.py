@@ -24,22 +24,22 @@ def load_users_from_csv():
     try:
         with open(CSV_FILENAME, 'r', newline='') as csvfile:
             reader = csv.reader(csvfile)
-            next(reader, None)  # Skip the header row if it exists
+            next(reader, None)
             for row in reader:
                 if len(row) == 2:
                     username, password = row
                     users[username] = password
     except FileNotFoundError:
-        pass  # It's okay if the file doesn't exist yet
+        pass
 
 def save_user_to_csv(username, password):
     with open(CSV_FILENAME, 'a', newline='') as csvfile:
         writer = csv.writer(csvfile)
         if not os.path.exists(CSV_FILENAME) or os.path.getsize(CSV_FILENAME) == 0:
-            writer.writerow(['username', 'password'])  # Write header if the file is new or empty
+            writer.writerow(['username', 'password']) 
         writer.writerow([username, password])
 
-load_users_from_csv()  # Load users when the application starts
+load_users_from_csv()
 
 #=====================================================================================================================================
 #Main pages
@@ -58,10 +58,10 @@ def login():
                 f.session['user'] = username
                 return f.redirect(f.url_for('create_timetable'))
             else:
-                error = "Incorrect password."  # Specific error for wrong password
+                error = "Incorrect password." 
                 return f.render_template('login.html', login_error=error)
         else:
-            error = "User does not exist."  # Specific error for non-existent user
+            error = "User does not exist."
             return f.render_template('login.html', login_error=error)
     return f.render_template('login.html')
 
@@ -85,7 +85,7 @@ def register():
             return f.render_template('register.html', register_error=error)
         else:
             users[new_username] = new_password
-            save_user_to_csv(new_username, new_password)  # Save the new user to CSV
+            save_user_to_csv(new_username, new_password)
             f.session['user'] = new_username
             return f.redirect(f.url_for('create_timetable'))
     return f.render_template('register.html')
@@ -94,9 +94,7 @@ def register():
 def forgot_password():
     if f.request.method == 'POST':
         email = f.request.form['email']
-        # In this simplified example, we'll use the username as a proxy for email for demonstration
         if email in users:
-            # Generate a simple reset token (insecure in real app!)
             token = os.urandom(16).hex()
             reset_tokens[token] = email
             message = f"A password reset link has been sent to the (simulated) email address: {email}. The link is: {f.url_for('reset_password', token=token, _external=True)}"
@@ -122,10 +120,9 @@ def reset_password(token):
         elif len(new_password) < 6:
             return f.render_template('reset_password_form.html', token=token, error="Password must be at least 6 characters long.")
         else:
-            # In this simplified example, we'll use the username as the key
             for username, stored_email in users.items():
                 if stored_email == email:
-                    users[username] = new_password # Reset the password (insecure in real app!)
+                    users[username] = new_password
                     save_all_users_to_csv()
                     del reset_tokens[token]
                     return f.redirect(f.url_for('login'))
@@ -136,7 +133,7 @@ def reset_password(token):
 def save_all_users_to_csv():
     with open(CSV_FILENAME, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(['username', 'password'])  # Write header
+        writer.writerow(['username', 'password'])
         for username, password in users.items():
             writer.writerow([username, password])
 
@@ -258,14 +255,14 @@ def import_timetable():
         csv_data = file.stream.read().decode('utf-8')
         si = StringIO(csv_data)
         reader = csv.reader(si)
-        header = next(reader, None)  # Skip header if present
+        header = next(reader, None)
 
         imported_timetable = []
         for row in reader:
             if len(row) == 4:
                 day, time, subject, teacher = row
                 imported_timetable.append({'day': day, 'time': time, 'subject': subject, 'teacher': teacher})
-            elif len(row) == 3: # Handle cases without teacher
+            elif len(row) == 3:
                 day, time, subject = row
                 imported_timetable.append({'day': day, 'time': time, 'subject': subject, 'teacher': ''})
             else:

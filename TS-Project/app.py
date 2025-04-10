@@ -4,7 +4,6 @@
 
 import flask as f
 import csv
-import datetime
 from io import StringIO, BytesIO
 import os
 
@@ -95,7 +94,7 @@ def forgot_password():
     if f.request.method == 'POST':
         email = f.request.form['email']
         if email in users:
-            token = os.urandom(16).hex()
+            token = 1
             reset_tokens[token] = email
             message = f"A password reset link has been sent to the (simulated) email address: {email}. The link is: {f.url_for('reset_password', token=token, _external=True)}"
             return f.render_template('forgot_password.html', forgot_password_message=message)
@@ -199,9 +198,9 @@ def view_timetable():
             structured_timetable[time] = {}
         structured_timetable[time][day] = f"{subject} ({teacher})" if teacher else subject
 
-    sorted_timetable = dict(sorted(structured_timetable.items()))
+    sorted_timetable = dict(structured_timetable.items())
 
-    return f.render_template('timetable_display.html', timetable_data=sorted_timetable, days_order=days_order)
+    return f.render_template('timetable_display.html', timetable_data=sorted_timetable, days_order=days_order, timetable_name = file_name[0:-4])
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -243,6 +242,7 @@ def import_export():
 
 @app.route('/timetable/import', methods=['POST'])
 def import_timetable():
+    global file_name
     if 'user' not in f.session:
         return f.redirect(f.url_for('login'))
 
@@ -252,6 +252,7 @@ def import_timetable():
     if file.filename == '':
         return "No selected file"
     if file and file.filename.endswith('.csv'):
+        file_name = file.filename
         csv_data = file.stream.read().decode('utf-8')
         si = StringIO(csv_data)
         reader = csv.reader(si)

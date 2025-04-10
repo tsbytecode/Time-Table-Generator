@@ -3,7 +3,7 @@
 {% block content %}
     <h2>Login</h2>
     {% if login_error %}
-        <p style="color: red;">{{ login_error }}</p>
+        <p style="color: #ff0000;">{{ login_error }}</p>
     {% endif %}
     <form method="POST" action="{{ url_for('login') }}">
         <div>

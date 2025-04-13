@@ -169,7 +169,7 @@ def view_timetable():
 
     sorted_timetable = dict(structured_timetable.items())
 
-    return f.render_template('timetable_display.html', timetable_data=sorted_timetable, days_order=days_order, timetable_name = file_name[0:-4])
+    return f.render_template('timetable_display.html', timetable_data=sorted_timetable, days_order=days_order)
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 

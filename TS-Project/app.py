@@ -6,6 +6,7 @@ import flask as f
 import csv
 from io import StringIO, BytesIO
 import os
+import bcrypt
 
 app = f.Flask(__name__)
 app.secret_key = 'blah'

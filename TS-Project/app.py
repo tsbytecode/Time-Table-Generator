@@ -14,29 +14,29 @@ app.secret_key = 'blah'
 #Sample accounts data
 #=====================================================================================================================================
 
-CSV_FILENAME = 'users.csv'
+csv_file_name = 'users.csv'
 users = {}
-reset_tokens = {}
+current_user = []
 
 def load_users_from_csv():
     users.clear()
     try:
-        with open(CSV_FILENAME, 'r', newline='') as csvfile:
+        with open(csv_file_name, 'r', newline='') as csvfile:
             reader = csv.reader(csvfile)
             next(reader, None)
             for row in reader:
-                if len(row) == 2:
-                    username, password = row
-                    users[username] = password
+                if len(row) == 3:
+                    username, password, acc_type = row
+                    users[username] = [password, acc_type]
     except FileNotFoundError:
         pass
 
-def save_user_to_csv(username, password):
-    with open(CSV_FILENAME, 'a', newline='') as csvfile:
+def save_user_to_csv(username, password, acc_type = "admin"):
+    with open(csv_file_name, 'a', newline='') as csvfile:
         writer = csv.writer(csvfile)
-        if not os.path.exists(CSV_FILENAME) or os.path.getsize(CSV_FILENAME) == 0:
-            writer.writerow(['username', 'password']) 
-        writer.writerow([username, password])
+        if not os.path.exists(csv_file_name) or os.path.getsize(csv_file_name) == 0:
+            writer.writerow(['username', 'password', 'status']) 
+        writer.writerow([username, password, acc_type])
 
 load_users_from_csv()
 
@@ -49,20 +49,26 @@ load_users_from_csv()
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if f.request.method == 'POST':
-        username = f.request.form['username']
-        password = f.request.form['password']
-        if username in users:
-            if users[username] == password:
-                f.session['user'] = username
-                return f.redirect(f.url_for('create_timetable'))
+    if 'user' not in f.session:       
+        if f.request.method == 'POST':
+            username = f.request.form['username']
+            password = f.request.form['password']
+            if username in users:
+                if users[username][0] == password:
+                    f.session['user'] = username
+                    if users[username][1] == "admin":
+                        return f.redirect(f.url_for('create_timetable'))
+                    else:
+                        return f.redirect(f.url_for('view_timetable'))
+                else:
+                    error = "Incorrect password." 
+                    return f.render_template('login.html', login_error=error)
             else:
-                error = "Incorrect password." 
+                error = "User does not exist."
                 return f.render_template('login.html', login_error=error)
-        else:
-            error = "User does not exist."
-            return f.render_template('login.html', login_error=error)
-    return f.render_template('login.html')
+        return f.render_template('login.html')
+    else: 
+        return f.redirect(f.url_for('view_timetable'))
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -72,7 +78,6 @@ def register():
         new_username = f.request.form['new_username']
         new_password = f.request.form['new_password']
         confirm_password = f.request.form['confirm_password']
-
         if new_username in users:
             error = "Username already exists."
             return f.render_template('register.html', register_error=error)
@@ -86,55 +91,15 @@ def register():
             users[new_username] = new_password
             save_user_to_csv(new_username, new_password)
             f.session['user'] = new_username
-            return f.redirect(f.url_for('create_timetable'))
+            if users[new_username][1] == "admin":
+                return f.redirect(f.url_for('create_timetable'))
+            else:
+                return f.redirect(f.url_for('view_timetable'))
     return f.render_template('register.html')
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
-    if f.request.method == 'POST':
-        email = f.request.form['email']
-        if email in users:
-            token = 1
-            reset_tokens[token] = email
-            message = f"A password reset link has been sent to the (simulated) email address: {email}. The link is: {f.url_for('reset_password', token=token, _external=True)}"
-            return f.render_template('forgot_password.html', forgot_password_message=message)
-        else:
-            error = "Username (as email proxy) not found."
-            return f.render_template('forgot_password.html', forgot_password_error=error)
-    return f.render_template('forgot_password.html')
-
-@app.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_password(token):
-    if token not in reset_tokens:
-        return f.render_template('message.html', message="Invalid or expired reset link.")
-
-    email = reset_tokens[token]
-
-    if f.request.method == 'POST':
-        new_password = f.request.form['new_password']
-        confirm_password = f.request.form['confirm_password']
-
-        if new_password != confirm_password:
-            return f.render_template('reset_password_form.html', token=token, error="Passwords do not match.")
-        elif len(new_password) < 6:
-            return f.render_template('reset_password_form.html', token=token, error="Password must be at least 6 characters long.")
-        else:
-            for username, stored_email in users.items():
-                if stored_email == email:
-                    users[username] = new_password
-                    save_all_users_to_csv()
-                    del reset_tokens[token]
-                    return f.redirect(f.url_for('login'))
-            return f.render_template('message.html', message="Password reset successful. You can now log in.")
-
-    return f.render_template('reset_password_form.html', token=token)
-
-def save_all_users_to_csv():
-    with open(CSV_FILENAME, 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(['username', 'password'])
-        for username, password in users.items():
-            writer.writerow([username, password])
+    return f.redirect(f.url_for('login'))
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -153,8 +118,11 @@ def logout():
 def create_timetable():
     if 'user' not in f.session:
         return f.redirect(f.url_for('login'))
-    timetable = f.session.get('timetable', [])
-    return f.render_template('timetable_form.html', timetable=timetable)
+    if users[f.session['user']][1] == "admin":
+        timetable = f.session.get('timetable', [])
+        return f.render_template('timetable_form.html', timetable=timetable)
+    else:
+        return f.redirect(f.url_for('view_timetable'))
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -164,18 +132,22 @@ def create_timetable():
 def save_timetable():
     if 'user' not in f.session:
         return f.redirect(f.url_for('login'))
-    timetable_data = []
-    for key, value in f.request.form.items():
-        if key.startswith('day_'):
-            index = key.split('_')[1]
-            day = value
-            time = f.request.form.get(f'time_{index}')
-            subject = f.request.form.get(f'subject_{index}')
-            teacher = f.request.form.get(f'teacher_{index}', '')
-            if time and subject and day:
-                timetable_data.append({'day': day, 'time': time, 'subject': subject, 'teacher': teacher})
-    f.session['timetable'] = timetable_data
-    return f.redirect(f.url_for('view_timetable'))
+    if users[f.session['user']][1] == "admin":
+        timetable_data = []
+        for key, value in f.request.form.items():
+            if key.startswith('day_'):
+                index = key.split('_')[1]
+                day = value
+                time = f.request.form.get(f'time_{index}')
+                subject = f.request.form.get(f'subject_{index}')
+                teacher = f.request.form.get(f'teacher_{index}', '')
+                if time and subject and day:
+                    timetable_data.append({'day': day, 'time': time, 'subject': subject, 'teacher': teacher})
+        f.session['timetable'] = timetable_data
+        return f.redirect(f.url_for('view_timetable'))
+    else:
+        return f.redirect(f.url_for('view_timetable'))
+
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -200,7 +172,7 @@ def view_timetable():
 
     sorted_timetable = dict(structured_timetable.items())
 
-    return f.render_template('timetable_display.html', timetable_data=sorted_timetable, days_order=days_order, timetable_name = file_name[0:-4])
+    return f.render_template('timetable_display.html', timetable_data=sorted_timetable, days_order=days_order)
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -279,6 +251,11 @@ def timetable_import():
     if 'user' not in f.session:
         return f.redirect(f.url_for('login'))
     return f.render_template('timetable_import.html')
+
+@app.route('/creators')
+def the_creators():
+    return f.render_template('creators.html')
+
 
 #=====================================================================================================================================
 #App run

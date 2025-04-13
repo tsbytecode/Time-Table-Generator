@@ -134,13 +134,13 @@ tr:nth-child(even) {
 
 footer {
     text-align: center;
-    margin-top: 3em;
-    padding: 1.2em;
+    margin-top: 2em;
+    padding: 0.2em;
     background-color: #31303A;
     color: #F2DFCB;
     border-radius: 8px;
     box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.4);
-    font-size: 0.85em;
+    font-size: 1em;
 }
 
 .timetable-entry {

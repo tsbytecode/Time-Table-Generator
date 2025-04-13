@@ -49,23 +49,26 @@ load_users_from_csv()
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if f.request.method == 'POST':
-        username = f.request.form['username']
-        password = f.request.form['password']
-        if username in users:
-            if users[username][0] == password:
-                f.session['user'] = username
-                if users[username][1] == "admin":
-                    return f.redirect(f.url_for('create_timetable'))
+    if 'user' not in f.session:       
+        if f.request.method == 'POST':
+            username = f.request.form['username']
+            password = f.request.form['password']
+            if username in users:
+                if users[username][0] == password:
+                    f.session['user'] = username
+                    if users[username][1] == "admin":
+                        return f.redirect(f.url_for('create_timetable'))
+                    else:
+                        return f.redirect(f.url_for('view_timetable'))
                 else:
-                    return f.redirect(f.url_for('view_timetable'))
+                    error = "Incorrect password." 
+                    return f.render_template('login.html', login_error=error)
             else:
-                error = "Incorrect password." 
+                error = "User does not exist."
                 return f.render_template('login.html', login_error=error)
-        else:
-            error = "User does not exist."
-            return f.render_template('login.html', login_error=error)
-    return f.render_template('login.html')
+        return f.render_template('login.html')
+    else: 
+        return f.redirect(f.url_for('view_timetable'))
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -248,6 +251,11 @@ def timetable_import():
     if 'user' not in f.session:
         return f.redirect(f.url_for('login'))
     return f.render_template('timetable_import.html')
+
+@app.route('/creators')
+def the_creators():
+    return f.render_template('creators.html')
+
 
 #=====================================================================================================================================
 #App run

@@ -4,6 +4,10 @@
 
 {% block content %}
     <h2>Create/Edit Timetable</h2>
+    <form method="GET" action="{{ url_for('generate') }}">
+        <button type="submit">Auto Generate Timetable</button>
+    </form>
+    <br>
     <form method="POST" id="timetable-form" action="{{ url_for('save_timetable') }}">
         <div id="timetable-entries">
             {% if timetable %}

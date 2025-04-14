@@ -10,6 +10,7 @@ import bcrypt
 
 app = f.Flask(__name__)
 app.secret_key = 'blah'
+timetable_data = {}
 
 #=====================================================================================================================================
 #Sample accounts data
@@ -57,7 +58,8 @@ def login():
             if username in users:
                 if users[username][0] == password:
                     f.session['user'] = username
-                    if users[username][1] == "admin":
+                    f.session['acc_type'] = users[username][1]
+                    if f.session['acc_type'] == "admin":
                         return f.redirect(f.url_for('create_timetable'))
                     else:
                         return f.redirect(f.url_for('view_timetable'))
@@ -89,10 +91,10 @@ def register():
             error = "Password must be at least 6 characters long."
             return f.render_template('register.html', register_error=error)
         else:
-            users[new_username] = new_password
+            users[new_username][0] = new_password
             save_user_to_csv(new_username, new_password)
             f.session['user'] = new_username
-            if users[new_username][1] == "admin":
+            if f.session['acc_type'] == "admin":
                 return f.redirect(f.url_for('create_timetable'))
             else:
                 return f.redirect(f.url_for('view_timetable'))
@@ -119,7 +121,7 @@ def logout():
 def create_timetable():
     if 'user' not in f.session:
         return f.redirect(f.url_for('login'))
-    if users[f.session['user']][1] == "admin":
+    if f.session['acc_type'] == "admin":
         timetable = f.session.get('timetable', [])
         return f.render_template('timetable_form.html', timetable=timetable)
     else:
@@ -133,7 +135,7 @@ def create_timetable():
 def save_timetable():
     if 'user' not in f.session:
         return f.redirect(f.url_for('login'))
-    if users[f.session['user']][1] == "admin":
+    if f.session['acc_type'] == "admin":
         timetable_data = []
         for key, value in f.request.form.items():
             if key.startswith('day_'):
@@ -176,7 +178,6 @@ def view_timetable():
     return f.render_template('timetable_display.html', timetable_data=sorted_timetable, days_order=days_order)
 
 #-----------------------------------------------------------------------------------------------------------------------------------
-
 #Export timetable
 
 @app.route('/timetable/export')
@@ -215,17 +216,14 @@ def import_export():
 
 @app.route('/timetable/import', methods=['POST'])
 def import_timetable():
-    global file_name
     if 'user' not in f.session:
         return f.redirect(f.url_for('login'))
-
     if 'csv_file' not in f.request.files:
         return "No file part"
     file = f.request.files['csv_file']
     if file.filename == '':
         return "No selected file"
     if file and file.filename.endswith('.csv'):
-        file_name = file.filename
         csv_data = file.stream.read().decode('utf-8')
         si = StringIO(csv_data)
         reader = csv.reader(si)
@@ -257,6 +255,18 @@ def timetable_import():
 def the_creators():
     return f.render_template('creators.html')
 
+@app.route('/generate')
+def generate():
+    days_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    timetable_data = {}
+    time = ["8:50 - 9:30", "9:50 - 10:10", "10:20 - 11:00", "11:00 - 11:40", "11:40 - 12:20", "12:50 - 1:30", "1:30 - 2:10", "2:10 - 2:50", "2:50 - 3:30"]
+    for i in time:  
+        timetable_data[i] = {}  
+        for j in days_order:
+            timetable_data[i][j] = "Math"
+    f.session['timetable'] = timetable_data
+    return f.render_template('timetable_display.html', days_order=days_order, timetable_data=timetable_data)
+    
 
 #=====================================================================================================================================
 #App run

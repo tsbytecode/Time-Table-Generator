@@ -51,6 +51,7 @@ load_users_from_csv()
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    f.session.pop('user', None)
     if 'user' not in f.session:       
         if f.request.method == 'POST':
             username = f.request.form['username']

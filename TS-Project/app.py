@@ -265,7 +265,7 @@ def generate():
     for time in time_order:  
         timetable_data[time] = {}  
         for day in days_order:
-            timetable_data[time][day] = subjects[random.randint(1, 12)]
+            timetable_data[time][day] = subjects[random.randint(0, 12)]
     f.session['timetable'] = timetable_data
     return f.render_template('timetable_display.html', days_order=days_order, timetable_data=timetable_data)
     

@@ -6,7 +6,7 @@ import flask as f
 import csv
 from io import StringIO, BytesIO
 import os
-import bcrypt
+import random
 
 app = f.Flask(__name__)
 app.secret_key = 'blah'
@@ -260,11 +260,12 @@ def the_creators():
 def generate():
     days_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     timetable_data = {}
-    time = ["8:50 - 9:30", "9:50 - 10:10", "10:20 - 11:00", "11:00 - 11:40", "11:40 - 12:20", "12:50 - 1:30", "1:30 - 2:10", "2:10 - 2:50", "2:50 - 3:30"]
-    for i in time:  
-        timetable_data[i] = {}  
-        for j in days_order:
-            timetable_data[i][j] = "Math"
+    time_order = ["8:50 - 9:30", "9:50 - 10:10", "10:20 - 11:00", "11:00 - 11:40", "11:40 - 12:20", "12:50 - 1:30", "1:30 - 2:10", "2:10 - 2:50", "2:50 - 3:30"]
+    subjects = ["Math", "English", "Chemistry", "Physics", "Art", "Music", "Biology", "Computer Science", "Dance", "Sports", "Volleyball", "MSA"]
+    for time in time_order:  
+        timetable_data[time] = {}  
+        for day in days_order:
+            timetable_data[time][day] = subjects[random.randint(1, 12)]
     f.session['timetable'] = timetable_data
     return f.render_template('timetable_display.html', days_order=days_order, timetable_data=timetable_data)
     

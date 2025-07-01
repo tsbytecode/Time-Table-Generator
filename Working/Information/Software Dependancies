@@ -1,0 +1,3 @@
+To be installed on pc:
++ pip --> sudo apt-get install python3-pip
++ flask --> pip install flask

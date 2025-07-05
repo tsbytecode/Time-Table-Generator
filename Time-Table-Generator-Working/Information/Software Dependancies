@@ -1,0 +1,8 @@
+Installation of pip:
++ pip --> sudo apt-get install python3-pip
+
+Installation of flask with internet:
++ flask --> pip install flask
+
+Installation of flask without internet:
++ flask --> pip install flask --no-index -f "D:\Time-Table-Generator\Offline Packages"

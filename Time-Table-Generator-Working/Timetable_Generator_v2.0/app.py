@@ -338,7 +338,7 @@ def auto_save_timetable():
 
     # f.session['timetable'] = timetable_data
     # return f.redirect(f.url_for('view_timetable'))
-    conn = sql.connect(os.path.abspath(os.getcwd())+'/../../algo/x.db')
+    conn = sql.connect(os.path.abspath(os.getcwd())+'/algo/x.db')
     conn.row_factory = sql.Row  # This allows you to access columns by name
     timetable_query = """
     SELECT

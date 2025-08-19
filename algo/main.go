@@ -216,5 +216,5 @@ func main() {
 
 	port := "8080"
 	fmt.Printf("Server starting on port %s...\n", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Fatal(http.ListenAndServe("localhost:"+port, nil))
 }

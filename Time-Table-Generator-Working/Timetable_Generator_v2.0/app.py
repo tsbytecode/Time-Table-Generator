@@ -18,7 +18,7 @@ app.secret_key = 'code'
 #Sample accounts data
 #=====================================================================================================================================
 
-CSV_FILENAME = 'users.csv'
+CSV_FILENAME = r"Time-Table-Generator-Working\Timetable_Generator_v2.0\users.csv"
 users = {}
 reset_tokens = {}
 
@@ -300,44 +300,6 @@ def auto_save_timetable():
     
     print(generate_timetable(cls))
 
-    # p = os.path.abspath(os.getcwd())+'/'+cls+'.csv'
-    # output_timetable_csv(cls, p)
-
-    # try:
-    #     with open(p, 'r', encoding='utf-8') as file:
-    #         csv_data = file.read()
-    #         si = StringIO(csv_data)
-    #         reader = csv.reader(si)
-
-    #         # Check for the correct header
-    #         expected_header = ["Day", "Time Slot", "Subject", "Teacher"]
-    #         header = next(reader, None)
-    #         if header != expected_header:
-    #             print("Invalid CSV header. Expected: Day,Time Slot,Subject,Teacher")
-    #             return None
-
-    #         imported_timetable = []
-    #         for row in reader:
-    #             if len(row) == 4:
-    #                 day, time, subject, teacher = row
-    #                 imported_timetable.append({'day': day, 'time': time, 'subject': subject, 'teacher': teacher})
-    #             elif len(row) == 3:
-    #                 day, time, subject = row
-    #                 imported_timetable.append({'day': day, 'time': time, 'subject': subject, 'teacher': ''})
-    #             else:
-    #                 print(f"Skipping invalid row: {row}")
-
-    #         return imported_timetable
-
-    # except FileNotFoundError:
-    #     print(f"Error: The file at {p} was not found.")
-    #     return None
-    # except Exception as e:
-    #     print(f"An error occurred: {e}")
-    #     return None
-
-    # f.session['timetable'] = timetable_data
-    # return f.redirect(f.url_for('view_timetable'))
     conn = sql.connect(os.path.abspath(os.getcwd())+'/algo/x.db')
     conn.row_factory = sql.Row  # This allows you to access columns by name
     timetable_query = """

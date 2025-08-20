@@ -18,6 +18,9 @@
             <form method="GET" action="{{ url_for('import_export') }}" style="font-size: 20px; margin-left: 25px; margin-top: 20px;">
                 <button type="submit">Export/Import</button>
             </form>
+            <form method="GET" action="{{ url_for('auto_create_timetable') }}" style="font-size: 20px; margin-left: 25px; margin-top: 20px;">
+                <button type="submit">Auto Generate Timetable</button>
+            </form>
         <br>
         {% if session['user'] %}
             <p class="user-info">Logged in as: {{ session['user'] }}</p>

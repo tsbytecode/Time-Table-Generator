@@ -99,7 +99,11 @@ func generateClassHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	success := dbConn.GenerateClass(req.ClassID)
+	success, err := dbConn.GenerateClass(req.ClassID)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error generating timetable: %v", err), http.StatusInternalServerError)
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	if success {

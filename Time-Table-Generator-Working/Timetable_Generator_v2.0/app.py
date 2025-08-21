@@ -11,7 +11,7 @@ import json
 import sqlite3 as sql
 
 app = f.Flask(__name__)
-app.secret_key = 'code'
+app.secret_key = os.urandom(24)
 
 #=====================================================================================================================================
 #users sql
@@ -338,14 +338,7 @@ def save_timetable_to_db():
             # Skip invalid periods or handle the error as needed
             continue
 
-        teacherid = ''
-        if not period.get('teacherid') :
-            if not period.get('subject') :
-                teacherid = 'na'
-            else :
-                teacherid = period.get('subject')
-        else :
-            teacherid = period.get(teacherid)
+        teacherid = period.get('teacher', '') or period.get('subject', 'na')
 
         cursor.execute(
             "INSERT INTO periods (classID, day, periodno, subject, teacherid) VALUES (?, ?, ?, ?, ?)",
@@ -546,42 +539,39 @@ def import_export():
 
 #Import timetable
 
-@app.route('/timetable/import', methods=['POST'])
+@app.route('/timetable/import', methods=['GET', 'POST'])
 def import_timetable():
     if 'user' not in f.session:
         return f.redirect(f.url_for('login'))
 
-    if 'csv_file' not in f.request.files:
-        return "No file part"
-    file = f.request.files['csv_file']
-    if file.filename == '':
-        return "No selected file"
-    if file and file.filename.endswith('.csv'):
-        csv_data = file.stream.read().decode('utf-8')
-        si = StringIO(csv_data)
-        reader = csv.reader(si)
-        header = next(reader, None)
+    if f.request.method == 'POST':
+        if 'csv_file' not in f.request.files:
+            return "No file part"
+        file = f.request.files['csv_file']
+        if file.filename == '':
+            return "No selected file"
+        if file and file.filename.endswith('.csv'):
+            csv_data = file.stream.read().decode('utf-8')
+            si = StringIO(csv_data)
+            reader = csv.reader(si)
+            header = next(reader, None)
 
-        imported_timetable = []
-        for row in reader:
-            if len(row) == 4:
-                day, time, subject, teacher = row
-                imported_timetable.append({'day': day, 'time': time, 'subject': subject, 'teacher': teacher})
-            elif len(row) == 3:
-                day, time, subject = row
-                imported_timetable.append({'day': day, 'time': time, 'subject': subject, 'teacher': ''})
-            else:
-                return "Invalid CSV format: Each row should have 3 or 4 columns (Day, Time Slot, Subject, Teacher)."
+            imported_timetable = []
+            for row in reader:
+                if len(row) == 4:
+                    day, time, subject, teacher = row
+                    imported_timetable.append({'day': day, 'time': time, 'subject': subject, 'teacher': teacher})
+                elif len(row) == 3:
+                    day, time, subject = row
+                    imported_timetable.append({'day': day, 'time': time, 'subject': subject, 'teacher': ''})
+                else:
+                    return "Invalid CSV format: Each row should have 3 or 4 columns (Day, Time Slot, Subject, Teacher)."
 
-        f.session['timetable'] = imported_timetable
-        return f.redirect(f.url_for('view_timetable'))
-    else:
-        return "Please upload a CSV file."
-    
-@app.route('/timetable/import')
-def timetable_import():
-    if 'user' not in f.session:
-        return f.redirect(f.url_for('login'))
+            f.session['timetable'] = imported_timetable
+            return f.redirect(f.url_for('view_timetable'))
+        else:
+            return "Please upload a CSV file."
+
     return f.render_template('timetable_import.html')
 
 #-----------------------------------------------------------------------------------------------------------------------------------

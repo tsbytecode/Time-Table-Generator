@@ -57,10 +57,11 @@ type Assignment struct {
 }
 
 func (d *DBconn) getPossibleAssignments(classID string, periodno int, date string) ([]Assignment, error) {
-	rows, err := d.conn.Query("SELECT * FROM assignments WHERE classid = ? AND periodsused != periodsneeded ORDER BY periodsused", classID)
+	rows, err := d.conn.Query("SELECT * FROM assignments WHERE classid = ? AND periodsused < periodsneeded ORDER BY periodsused", classID)
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	var assignments []Assignment
 	for rows.Next() {
@@ -75,18 +76,24 @@ func (d *DBconn) getPossibleAssignments(classID string, periodno int, date strin
 		if err != nil {
 			return nil, err
 		}
-		c.Scan(&count)
-		if count != 0 {
-			continue
+		if c.Next() {
+			err = c.Scan(&count)
+			if err != nil {
+				c.Close()
+				return nil, err
+			}
 		}
+		c.Close()
 
-		assignments = append(assignments, a)
+		if count == 0 {
+			assignments = append(assignments, a)
+		}
 	}
 	return assignments, nil
 }
 
 func (a *Assignment) NewAssignments(d *DBconn) error {
-	_, err := d.conn.Exec("INSERT INTO assignments (teacherid, classid, periodsneeded, subject, periodsused) VALUES (?, ?, ?, ?, ?)", a.TeacherID, a.ClassID, a.Periodsneeded, a.Subject, int(0))
+	_, err := d.conn.Exec("INSERT INTO assignments (teacherid, classid, periodsneeded, subject, periodsused) VALUES (?, ?, ?, ?, ?)", a.TeacherID, a.ClassID, a.Periodsneeded, a.Subject, 0)
 	return err
 }
 
@@ -96,7 +103,7 @@ func (a *Assignment) IncrementAssignments(d *DBconn) error {
 }
 
 func (a *Assignment) DecrementAssignments(d *DBconn) error {
-	_, err := d.conn.Exec("UPDATE assignments SET periodsused = periodsused - 1 WHERE classid = ? AND teacherID = ?", a.TeacherID, a.ClassID)
+	_, err := d.conn.Exec("UPDATE assignments SET periodsused = periodsused - 1 WHERE classid = ? AND teacherID = ?", a.ClassID, a.TeacherID)
 	return err
 }
 
@@ -107,69 +114,93 @@ type period struct {
 }
 
 func (p *period) NewPeriod(d *DBconn) error {
-	_, err := d.conn.Exec("INSERT INTO periods (teacherid, Classid, periodno, day, subject) VALUES (?,?,?,?,?)", p.a.TeacherID, p.a.ClassID, p.Periodno, p.Day, p.a.Subject)
-	if err == nil {
-		p.a.IncrementAssignments(d)
+	err := p.a.IncrementAssignments(d)
+	if err != nil {
+		return err
 	}
+	_, err = d.conn.Exec("INSERT INTO periods (teacherid, Classid, periodno, day, subject) VALUES (?,?,?,?,?)", p.a.TeacherID, p.a.ClassID, p.Periodno, p.Day, p.a.Subject)
 	return err
 }
 
 func (p *period) RemovePeriod(d *DBconn) error {
-	_, err := d.conn.Exec("DELETE FROM periods WHERE classid = ? AND periodno = ? AND day = ?", p.a.ClassID, p.Periodno, p.Day)
-	if err == nil {
-		p.a.DecrementAssignments(d)
+	err := p.a.DecrementAssignments(d)
+	if err != nil {
+		return err
 	}
+	_, err = d.conn.Exec("DELETE FROM periods WHERE classid = ? AND periodno = ? AND day = ?", p.a.ClassID, p.Periodno, p.Day)
 	return err
 }
 
-func GenerateTimetable(d *DBconn) {
-
-}
-
-func (d *DBconn) GenerateClass(classID string) bool {
-	return d.Assignperiod(classID, "mon", 1, false)
-}
-
-func (d *DBconn) Assignperiod(classID string, day string, periodNo int, islast bool) bool {
-	a, err := d.getPossibleAssignments(classID, periodNo, day)
+func (d *DBconn) GenerateClass(classID string) (bool, error) {
+	// Clear any existing timetable for this class
+	_, err := d.conn.Exec("DELETE FROM periods WHERE classID = ?", classID)
 	if err != nil {
-		panic(err)
+		return false, err
 	}
-
-	if len(a) == 0 {
-		return false
+	// Reset used periods for this class
+	_, err = d.conn.Exec("UPDATE assignments SET periodsused = 0 WHERE classID = ?", classID)
+	if err != nil {
+		return false, err
 	}
-	if islast {
-		p := period{&a[0], periodNo, day}
+	return d.assignPeriod(classID, "mon", 1)
+}
 
-		err := p.NewPeriod(d)
-		if err != nil {
-			panic(err)
-		}
-	}
-
+func (d *DBconn) assignPeriod(classID string, day string, periodNo int) (bool, error) {
+	// Base case: If we have successfully scheduled all periods, we are done.
 	nd, np, done := next(day, periodNo)
 	if done {
-		d.Assignperiod(classID, nd, np, true)
-		return true
-	}
-
-	for loop := 0; loop < len(a); loop++ {
-		p := period{&a[loop], periodNo, day}
-
-		err := p.NewPeriod(d)
+		// Try to fill the last period
+		assignments, err := d.getPossibleAssignments(classID, periodNo, day)
 		if err != nil {
-			panic(err)
+			return false, err
+		}
+		if len(assignments) == 0 {
+			return false, nil // No assignment available for the last slot
+		}
+		p := period{&assignments[0], periodNo, day}
+		err = p.NewPeriod(d)
+		if err != nil {
+			return false, err
+		}
+		return true, nil
+	}
+
+	assignments, err := d.getPossibleAssignments(classID, periodNo, day)
+	if err != nil {
+		return false, err
+	}
+
+	if len(assignments) == 0 {
+		// If no assignments are possible for this slot, backtrack.
+		return false, nil
+	}
+
+	// Recursive step: Try each possible assignment for the current period.
+	for i := range assignments {
+		p := period{&assignments[i], periodNo, day}
+
+		err = p.NewPeriod(d)
+		if err != nil {
+			return false, err
 		}
 
-		if d.Assignperiod(classID, nd, np, false) {
-			return true
-		} else {
-			p.RemovePeriod(d)
+		success, err := d.assignPeriod(classID, nd, np)
+		if err != nil {
+			return false, err
+		}
+		if success {
+			return true, nil
+		}
+
+		// Backtrack
+		err = p.RemovePeriod(d)
+		if err != nil {
+			return false, err
 		}
 	}
-	return false
 
+	// If no assignment leads to a solution, return false.
+	return false, nil
 }
 
 func next(day string, periodno int) (string, int, bool) {

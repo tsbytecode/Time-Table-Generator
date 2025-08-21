@@ -1,0 +1,288 @@
+body {
+    min-height: 100vh;
+    padding-left: 45px;
+    margin: 0px;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #FFF1DC; /* Light peach background */
+    color: #3C2F2F; /* Dark text for contrast */
+    overflow-x: hidden;
+    display: flex;
+    line-height: 1.7;
+}
+
+.header-container {
+    background-color: #FFE5B4; /* Peach header background */
+    border: 4px solid #B39373; /* Soft brown border */
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    padding-top: 0px;
+}
+
+.main-header {
+    background-color: #FFE5B4; /* Peach header background */
+    color: #3C2F2F; /* Dark text */
+    padding: 0em 2.5em;
+    text-align: center;
+    margin-bottom: 0;
+    font-family: "Times New Roman", Times, serif;
+    font-weight: bold;
+    letter-spacing: 0.06em;
+    font-size: 1.3em;
+    line-height: 20px;
+}
+
+.user-info {
+    color: #3C2F2F; /* Dark text */
+    font-weight: bold;
+    margin-left: 25px;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100%;
+    background-color: #FFE5B4; /* Peach sidebar */
+    color: #3C2F2F; /* Dark text */
+    padding-top: 60px;
+    transition: left 0.3s ease;
+    z-index: 1000;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+.sidebar h2 {
+    color: #3C2F2F; /* Dark text */
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    font-family: "Times New Roman", Times, serif;
+    font-weight: bold;
+    text-align: center;
+    padding: 0 5px;
+    word-break: break-word;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0px;
+    margin: 20px;
+}
+
+.sidebar li {
+    margin-bottom: 10px;
+}
+
+.sidebar a {
+    display: block;
+    color: #3C2F2F; /* Dark text */
+    text-decoration: none;
+    padding: 10px 5px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    word-break: break-word;
+    font-size: 1em;
+}
+
+.sidebar a:hover {
+    background-color: #FADECB; /* Lighter peach on hover */
+}
+
+.content {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+.menu-toggle {
+    position: fixed;
+    top: 15px;
+    left: 5px;
+    background: none;
+    border: none;
+    color: #3C2F2F; /* Dark toggle button color */
+    font-size: 1.5em;
+    cursor: pointer;
+    z-index: 1001;
+    font-weight: bold;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: #F8F0E3; /* Off-white for table background */
+}
+
+th, td {
+    border: 1px solid #B39373; /* Soft brown table borders */
+    padding: 12px;
+    text-align: left;
+    word-break: break-word;
+}
+
+th {
+    background-color: #FADECB; /* Lighter peach table header */
+    color: #3C2F2F; /* Dark text */
+    font-weight: bold;
+}
+
+tr:nth-child(even) {
+    background-color: #FBF7F1; /* Slightly different shade for even rows */
+}
+
+tr:hover {
+    background-color: #F6EBDD; /* Hover effect */
+}
+
+button {
+    background-color: #FFE5B4; /* Peach button background */
+    color: #3C2F2F; /* Dark text on buttons */
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+button:hover {
+    background-color: #FADECB; /* Lighter peach on hover */
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+input[type="text"], input[type="password"], input[type="email"], input[type="number"], select, .password-input-container, .timetable-entry, .form-group {
+    background-color: #F8F0E3; /* Off-white background for inputs */
+    color: #3C2F2F; /* Dark text */
+    border: 1px solid #B39373; /* Soft brown border */
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input[type="file"] {
+    background-color: #F8F0E3; /* Off-white background */
+    color: #3C2F2F; /* Dark text */
+    border: 1px solid #B39373; /* Soft brown border */
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input::placeholder {
+    color: #6a5d52; /* Darker placeholder text */
+}
+
+input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus, input[type="number"]:focus, select:focus {
+    border-color: #B39373; /* Focus border color */
+    outline: none;
+    box-shadow: 0 0 5px rgba(179, 147, 115, 0.5);
+}
+
+.timetable-entry button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    font-size: 0.8em;
+}
+
+.password-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input-container input {
+    width: calc(100% - 40px);
+}
+
+.toggle-password-img {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+}
+
+.timetable-form-link {
+    display: block;
+    margin-top: 20px;
+    text-align: center;
+    color: #3C2F2F; /* Dark link color */
+}
+
+a {
+    color: #3C2F2F; /* Dark link color */
+    text-decoration: underline;
+}
+
+a:hover {
+    color: #5C4033; /* Darker link color on hover */
+}
+
+/* Base.html footer link */
+footer a {
+    color: #3C2F2F !important; /* Overriding the inline style to maintain theme */
+}
+
+/* Media Queries for Mobile Responsiveness */
+@media (max-width: 768px) {
+    body {
+        padding-left: 0;
+    }
+
+    .header-container {
+        padding: 5px;
+    }
+
+    .sidebar {
+        left: -100%;
+        width: 100%;
+        box-shadow: none;
+    }
+
+    .sidebar.open {
+        left: 0;
+    }
+
+    .menu-toggle {
+        left: 10px;
+    }
+
+    .content {
+        padding: 10px;
+    }
+}

@@ -9,13 +9,13 @@
             <thead>
                 <tr>
                     <th>Time</th>
-                    {% for day in days_order %}
-                        <th>{{ day }}</th>
+                    {% for time in timetable_data.keys() %}
+                        <th>{{ time }}</th>
                     {% endfor %}
                 </tr>
             </thead>
             <tbody>
-                {% for time, days in timetable_data.items()%}
+                {% for time, days in timetable_data.items() %}
                     <tr>
                         <td>{{ time }}</td>
                         {% for day in days_order %}

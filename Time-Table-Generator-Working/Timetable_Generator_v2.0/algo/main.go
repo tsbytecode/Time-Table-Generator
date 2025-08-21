@@ -1,63 +1,3 @@
-// package main
-
-// import (
-// 	"algorithm/algo"
-// 	"fmt"
-// )
-
-// func main() {
-
-// 	d, err := algo.NewDBconn(false, "example.db")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	assignments := []algo.Assignment{
-// 		{TeacherID: "mat1", ClassID: "12A", Periodsneeded: 7},
-// 		{TeacherID: "mat1", ClassID: "12B", Periodsneeded: 7},
-// 		{TeacherID: "mat1", ClassID: "11A", Periodsneeded: 7},
-// 		{TeacherID: "mat1", ClassID: "11B", Periodsneeded: 7},
-// 		{TeacherID: "phy1", ClassID: "11B", Periodsneeded: 7},
-// 		{TeacherID: "phy1", ClassID: "12B", Periodsneeded: 7},
-// 		{TeacherID: "phy1", ClassID: "11A", Periodsneeded: 7},
-// 		{TeacherID: "phy1", ClassID: "12A", Periodsneeded: 7},
-// 		{TeacherID: "bio1", ClassID: "11B", Periodsneeded: 7},
-// 		{TeacherID: "bio1", ClassID: "12B", Periodsneeded: 7},
-// 		{TeacherID: "cs2", ClassID: "11A", Periodsneeded: 7},
-// 		{TeacherID: "cs1", ClassID: "12A", Periodsneeded: 7},
-// 		{TeacherID: "che1", ClassID: "12B", Periodsneeded: 7},
-// 		{TeacherID: "che1", ClassID: "12A", Periodsneeded: 7},
-// 		{TeacherID: "che2", ClassID: "11B", Periodsneeded: 7},
-// 		{TeacherID: "che2", ClassID: "11A", Periodsneeded: 7},
-// 		{TeacherID: "eng1", ClassID: "12A", Periodsneeded: 7},
-// 		{TeacherID: "eng1", ClassID: "12B", Periodsneeded: 7},
-// 		{TeacherID: "eng2", ClassID: "11A", Periodsneeded: 7},
-// 		{TeacherID: "eng2", ClassID: "11B", Periodsneeded: 7},
-// 		{TeacherID: "apa1", ClassID: "11B", Periodsneeded: 5},
-// 		{TeacherID: "apa1", ClassID: "11A", Periodsneeded: 5},
-// 		{TeacherID: "apa1", ClassID: "12B", Periodsneeded: 5},
-// 		{TeacherID: "apa1", ClassID: "12A", Periodsneeded: 5},
-// 		{TeacherID: "spo1", ClassID: "11A", Periodsneeded: 7},
-// 		{TeacherID: "spo1", ClassID: "12A", Periodsneeded: 7},
-// 		{TeacherID: "spo1", ClassID: "11B", Periodsneeded: 7},
-// 		{TeacherID: "spo1", ClassID: "12B", Periodsneeded: 7},
-// 	}
-
-// 	for loop := 0; loop < len(assignments); loop++ {
-// 		err := assignments[loop].NewAssignments(d)
-// 		if err != nil {
-// 			fmt.Println(assignments[loop])
-// 			panic(err)
-// 		}
-// 	}
-
-// 	fmt.Println(d.GenerateClass("11A"))
-// 	fmt.Println(d.GenerateClass("12B"))
-// 	fmt.Println(d.GenerateClass("12A"))
-// 	fmt.Println(d.GenerateClass("11B"))
-
-// }
-
 package main
 
 import (
@@ -77,13 +17,8 @@ import (
 type AssignmentRequest struct {
 	TeacherID     string `json:"teacher_id"`
 	ClassID       string `json:"class_id"`
+	Subject       string `json:"subject"`
 	Periodsneeded int    `json:"periods_needed"`
-}
-
-// The OutputTimetableRequest struct is used for the new CSV output API.
-type OutputTimetableRequest struct {
-	ClassID  string `json:"class_id"`
-	Filename string `json:"filename"`
 }
 
 // The ResponseMessage struct is a standard way to send a JSON response
@@ -124,12 +59,14 @@ func newAssignmentHandler(w http.ResponseWriter, r *http.Request) {
 		TeacherID:     req.TeacherID,
 		ClassID:       req.ClassID,
 		Periodsneeded: req.Periodsneeded,
+		Subject:       req.Subject,
 	}
 
 	fmt.Println(newAssignment)
 
 	err = newAssignment.NewAssignments(dbConn)
 	if err != nil {
+		fmt.Print(err)
 		http.Error(w, fmt.Sprintf("Error creating assignment: %v", err), http.StatusInternalServerError)
 		return
 	}
@@ -172,35 +109,6 @@ func generateClassHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// outputTimetableHandler handles POST requests to output a timetable to a CSV file.
-func outputTimetableHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var req OutputTimetableRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	if req.ClassID == "" || req.Filename == "" {
-		http.Error(w, "Missing required fields: class_id, filename", http.StatusBadRequest)
-		return
-	}
-
-	err = dbConn.OutputClassTimetableCSV(req.ClassID, req.Filename)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Error generating CSV file: %v", err), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(ResponseMessage{Status: "success", Message: "Timetable successfully written to " + req.Filename})
-}
-
 func main() {
 	var err error
 	dbConn, err = algo.NewDBconn(false, "x.db")
@@ -212,7 +120,7 @@ func main() {
 
 	http.HandleFunc("/assignments", newAssignmentHandler)
 	http.HandleFunc("/generate-class", generateClassHandler)
-	http.HandleFunc("/output-csv", outputTimetableHandler) // New endpoint
+	//	http.HandleFunc("/output-csv", outputTimetableHandler) // New endpoint
 
 	port := "8080"
 	fmt.Printf("Server starting on port %s...\n", port)

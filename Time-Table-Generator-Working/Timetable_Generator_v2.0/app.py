@@ -52,7 +52,7 @@ load_users_from_csv()
 # The base URL for the Go API server. Change this if the server is running on a different port or host.
 BASE_URL = "http://localhost:8080"
 
-def create_assignment(teacher_id: str, class_id: str, periods_needed: int) -> dict:
+def create_assignment(teacher_id: str, class_id: str, periods_needed: int,subject:str) -> dict:
     """
     Sends a POST request to the /assignments endpoint to create a new assignment.
 
@@ -68,7 +68,8 @@ def create_assignment(teacher_id: str, class_id: str, periods_needed: int) -> di
     payload = {
         "teacher_id": teacher_id,
         "class_id": class_id,
-        "periods_needed": int(periods_needed)
+        "periods_needed": int(periods_needed),
+        "subject" : subject
     }
     headers = {"Content-Type": "application/json"}
     print(payload)
@@ -293,13 +294,15 @@ def auto_save_timetable():
         if key.startswith('teacher_'):
             index = key.split('_')[1]
             teacher = value
+            subject = f.request.form.get(f'subject_{index}')
             num_class = f.request.form.get(f'num_classes_{index}')
-            print(create_assignment(teacher,cls,num_class))            
+            print(create_assignment(teacher,cls,num_class,subject))            
         elif key.startswith('class_name') :
             cls = value.strip()
     
     print(generate_timetable(cls))
 
+    print(os.path.abspath(os.getcwd())+'/algo/x.db')
     conn = sql.connect(os.path.abspath(os.getcwd())+'/algo/x.db')
     conn.row_factory = sql.Row  # This allows you to access columns by name
     timetable_query = """
@@ -342,6 +345,8 @@ def auto_save_timetable():
     
     conn.close()
     
+    print(imported_timetable)
+
     # Store the retrieved data in the session
     f.session['timetable'] = imported_timetable
     

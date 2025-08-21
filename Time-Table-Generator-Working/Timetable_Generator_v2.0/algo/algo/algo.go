@@ -2,13 +2,9 @@ package algo
 
 import (
 	"database/sql"
-	"encoding/csv"
-	"os"
 
 	_ "github.com/glebarez/go-sqlite"
 )
-
-// class = {grade int , section char , teachers [string], assignments {}}
 
 type DBconn struct {
 	conn     *sql.DB
@@ -36,17 +32,12 @@ func NewDBconn(isMemory bool, path string) (*DBconn, error) {
 
 	d.conn = conn
 
-	_, err = d.conn.Exec("CREATE TABLE IF NOT EXISTS teachers (id TEXT , name TEXT, subject TEXT, PRIMARY KEY(id,subject))")
+	_, err = d.conn.Exec("CREATE TABLE IF NOT EXISTS assignments (teacherid TEXT , classID TEXT, periodsneeded INT, periodsused INT, subject TEXT, PRIMARY KEY(teacherid,classid))")
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = d.conn.Exec("CREATE TABLE IF NOT EXISTS assignments (teacherid TEXT , classID TEXT, periodsneeded INT, periodsused INT, PRIMARY KEY(teacherid,classid))")
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = d.conn.Exec("CREATE TABLE IF NOT EXISTS periods (teacherid TEXT , classID TEXT, periodno INT, day TEXT, PRIMARY KEY(classid,periodno,day))")
+	_, err = d.conn.Exec("CREATE TABLE IF NOT EXISTS periods (teacherid TEXT , classID TEXT, periodno INT, day TEXT, subject TEXT,PRIMARY KEY(classid,periodno,day))")
 	if err != nil {
 		return nil, err
 	}
@@ -57,87 +48,10 @@ func (d *DBconn) Close() {
 	d.conn.Close()
 }
 
-// type Teacher struct {
-// 	id      string
-// 	name    string
-// 	subject string
-// 	d       *DBconn
-// }
-
-// func (t *Teacher) AddTeachers() error {
-// 	_, err := t.d.conn.Exec("INSERT INTO teachers (?,?,?)", t.id, t.name, t.subject)
-// 	return err
-// }
-
-// OutputClassTimetableCSV generates a CSV file for a given class timetable.
-func (d *DBconn) OutputClassTimetableCSV(classID string, filename string) error {
-	// Time slot mapping based on your provided example
-	timeSlots := map[int]string{
-		1: "8:50 - 9:30",
-		2: "9:30 - 10:10",
-		3: "10:20 - 11:00",
-		4: "11:00 - 11:40",
-		5: "11:40 - 12:20",
-		6: "12:50 - 13:30",
-		7: "13:30 - 14:10",
-		8: "14:10 - 14:50",
-		9: "14:50 - 15:30",
-	}
-
-	// Open the file for writing. Create it if it doesn't exist, and truncate it if it does.
-	file, err := os.Create(filename)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	// Perform a JOIN to get the teacher's name and subject from the 'teachers' table
-	rows, err := d.conn.Query("SELECT T1.day, T1.periodno, T2.subject, T2.name FROM periods AS T1 JOIN teachers AS T2 ON T1.teacherid = T2.id WHERE T1.classID = ? ORDER BY T1.day, T1.periodno", classID)
-	if err != nil {
-		return err
-	}
-	defer rows.Close()
-
-	writer := csv.NewWriter(file)
-
-	// Write CSV header in the requested format
-	headers := []string{"Day", "Time Slot", "Subject", "Teacher"}
-	if err := writer.Write(headers); err != nil {
-		return err
-	}
-
-	for rows.Next() {
-		var day string
-		var periodNo int
-		var subject string
-		var teacherName string
-		if err := rows.Scan(&day, &periodNo, &subject, &teacherName); err != nil {
-			return err
-		}
-
-		// Use the map to get the time slot string
-		timeSlot, ok := timeSlots[periodNo]
-		if !ok {
-			timeSlot = "Unknown"
-		}
-
-		record := []string{day, timeSlot, subject, teacherName}
-		if err := writer.Write(record); err != nil {
-			return err
-		}
-	}
-
-	writer.Flush()
-	if err := writer.Error(); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 type Assignment struct {
 	TeacherID     string
 	ClassID       string
+	Subject       string
 	Periodsneeded int
 	periodsused   int
 }
@@ -151,7 +65,7 @@ func (d *DBconn) getPossibleAssignments(classID string, periodno int, date strin
 	var assignments []Assignment
 	for rows.Next() {
 		a := Assignment{}
-		err := rows.Scan(&a.TeacherID, &a.ClassID, &a.Periodsneeded, &a.periodsused)
+		err := rows.Scan(&a.TeacherID, &a.ClassID, &a.Periodsneeded, &a.periodsused, &a.Subject)
 		if err != nil {
 			return nil, err
 		}
@@ -172,7 +86,7 @@ func (d *DBconn) getPossibleAssignments(classID string, periodno int, date strin
 }
 
 func (a *Assignment) NewAssignments(d *DBconn) error {
-	_, err := d.conn.Exec("INSERT INTO assignments (teacherid, classid, periodsneeded, periodsused) VALUES (?, ?, ?, 0)", a.TeacherID, a.ClassID, a.Periodsneeded)
+	_, err := d.conn.Exec("INSERT INTO assignments (teacherid, classid, periodsneeded, subject, periodsused) VALUES (?, ?, ?, ?, ?)", a.TeacherID, a.ClassID, a.Periodsneeded, a.Subject, int(0))
 	return err
 }
 
@@ -193,7 +107,7 @@ type period struct {
 }
 
 func (p *period) NewPeriod(d *DBconn) error {
-	_, err := d.conn.Exec("INSERT INTO periods (teacherid, Classid, periodno, day) VALUES (?,?,?,?)", p.a.TeacherID, p.a.ClassID, p.Periodno, p.Day)
+	_, err := d.conn.Exec("INSERT INTO periods (teacherid, Classid, periodno, day, subject) VALUES (?,?,?,?,?)", p.a.TeacherID, p.a.ClassID, p.Periodno, p.Day, p.a.Subject)
 	if err == nil {
 		p.a.IncrementAssignments(d)
 	}
@@ -276,26 +190,5 @@ func next(day string, periodno int) (string, int, bool) {
 	}
 
 	return day, periodno + 1, false
-
-}
-
-func prev(day string, periodno int) (string, int, bool) {
-	days := []string{"mon", "tue", "wed", "thu", "fri"}
-	if periodno == 1 {
-		loop := 1
-		for loop = 1; loop < 6; loop++ {
-			if days[loop] == day {
-				break
-			}
-		}
-
-		if loop == 1 {
-			return "", 0, true
-		} else {
-			return days[loop-1], 1, false
-		}
-	}
-
-	return day, periodno - 1, false
 
 }

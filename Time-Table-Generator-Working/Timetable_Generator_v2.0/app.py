@@ -14,40 +14,122 @@ import sqlite3 as sql
 app = f.Flask(__name__)
 app.secret_key = 'code'
 
-#=====================================================================================================================================
-#Sample accounts data
-#=====================================================================================================================================
-
-CSV_FILENAME = r"Time-Table-Generator-Working\Timetable_Generator_v2.0\users.csv"
-users = {}
 reset_tokens = {}
 
-def load_users_from_csv():
-    users.clear()
-    try:
-        with open(CSV_FILENAME, 'r', newline='') as csvfile:
-            reader = csv.reader(csvfile)
-            next(reader, None)
-            for row in reader:
-                if len(row) == 2:
-                    username, password = row
-                    users[username] = password
-    except FileNotFoundError:
-        pass
+#=====================================================================================================================================
+#users sql
+#=====================================================================================================================================
 
-def save_user_to_csv(username, password):
-    with open(CSV_FILENAME, 'a', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        if not os.path.exists(CSV_FILENAME) or os.path.getsize(CSV_FILENAME) == 0:
-            writer.writerow(['username', 'password']) 
-        writer.writerow([username, password])
+class UserDBManager:
+    def __init__(self, path):
+        try:
+            self.conn = sql.connect(path, check_same_thread=False)
+            self.conn.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                    userid TEXT,
+                    level TEXT,
+                    password TEXT,
+                    PRIMARY KEY(userid, level)
+                )
+            """)
+            self.conn.commit()
+            print("Successfully connected to the database and ensured 'users' table exists.")
+        except sql.Error as e:
+            print(f"Database connection error: {e}")
+            self.conn = None
 
-load_users_from_csv()
+    def get_password(self, userid):
+        """
+        Retrieves all passwords for a specific user and checks if the user exists.
+        
+        Args:
+            userid (str): The user's ID.
+            
+        Returns:
+            tuple: A tuple containing a list of passwords (or None if no passwords found)
+                   and a boolean indicating if the user exists.
+        """
+        if not self.conn:
+            return (None, False)
+        try:
+            cursor = self.conn.execute("SELECT password FROM users WHERE userid = ?", (userid,))
+            results = cursor.fetchall()
+            if results:
+                # Flatten the list of tuples into a simple list of passwords
+                passwords = [result[0] for result in results]
+                return (passwords[0], True)
+            else:
+                return (None, False)
+        except sql.Error as e:
+            print(f"Error fetching password: {e}")
+            return (None, False)
+
+    def add_user(self, userid, level, password):
+        """
+        Adds a new user to the database.
+        
+        Args:
+            userid (str): The user's ID.
+            level (str): The user's access level.
+            password (str): The user's password.
+            
+        Returns:
+            bool: True if the user was added successfully, False otherwise.
+        """
+        if not self.conn:
+            return False
+        try:
+            self.conn.execute("INSERT INTO users (userid, level, password) VALUES (?, ?, ?)", (userid, level, password))
+            self.conn.commit()
+            print(f"User '{userid}' added successfully.")
+            return True
+        except sql.IntegrityError:
+            print(f"Error: User '{userid}' with level '{level}' already exists.")
+            return False
+        except sql.Error as e:
+            print(f"Error adding user: {e}")
+            return False
+
+    def change_password(self, userid, new_password):
+        """
+        Changes the password for an existing user.
+        
+        Args:
+            userid (str): The user's ID.
+            level (str): The user's access level.
+            new_password (str): The new password to set.
+            
+        Returns:
+            bool: True if the password was changed successfully, False otherwise.
+        """
+        if not self.conn:
+            return False
+        try:
+            cursor = self.conn.execute("UPDATE users SET password = ? WHERE userid = ?", (new_password, userid))
+            self.conn.commit()
+            if cursor.rowcount > 0:
+                print(f"Password for user '{userid}' changed successfully.")
+                return True
+            else:
+                print(f"Error: User '{userid}' not found.")
+                return False
+        except sql.Error as e:
+            print(f"Error changing password: {e}")
+            return False
+
+    def close(self):
+        """Closes the database connection."""
+        if self.conn:
+            self.conn.close()
+            print("Database connection closed.")
+
+# Get the absolute path for the database file
+userdb_path = os.path.join(os.path.abspath(os.getcwd()), 'users.db')
+userdb = UserDBManager(userdb_path)
 
 #=====================================================================================================================================
 #sql lite 
 #=====================================================================================================================================
-
 
 # The base URL for the Go API server. Change this if the server is running on a different port or host.
 BASE_URL = "http://localhost:8080"
@@ -102,31 +184,6 @@ def generate_timetable(class_id: str) -> dict:
     except requests.exceptions.RequestException as e:
         return {"status": "error", "message": str(e)}
 
-def output_timetable_csv(class_id: str, filename: str) -> dict:
-    """
-    Sends a POST request to the /output-csv endpoint to generate a CSV file on the server.
-
-    Args:
-        class_id (str): The ID of the class whose timetable to output.
-        filename (str): The name of the file to save the CSV to on the server.
-
-    Returns:
-        dict: A dictionary containing the JSON response from the API.
-    """
-    url = f"{BASE_URL}/output-csv"
-    payload = {
-        "class_id": class_id,
-        "filename": filename
-    }
-    headers = {"Content-Type": "application/json"}
-
-    try:
-        response = requests.post(url, data=json.dumps(payload), headers=headers)
-        response.raise_for_status()
-        return response.json()
-    except requests.exceptions.RequestException as e:
-        return {"status": "error", "message": str(e)}
-
 
 #=====================================================================================================================================
 #Main pages
@@ -145,8 +202,10 @@ def login():
         if f.request.method == 'POST':
             username = f.request.form['username']
             password = f.request.form['password']
-            if username in users:
-                if users[username] == password:
+
+            userdata = userdb.get_password(username)
+            if userdata[1]:
+                if userdata[0] == password:
                     f.session['user'] = username
                     return f.redirect(f.url_for('create_timetable'))
                 else:
@@ -168,7 +227,8 @@ def register():
         new_password = f.request.form['new_password']
         confirm_password = f.request.form['confirm_password']
 
-        if new_username in users:
+        userdata = userdb.get_password(new_username)
+        if userdata[1]:
             error = "Username already exists."
             return f.render_template('register.html', register_error=error)
         elif new_password != confirm_password:
@@ -178,8 +238,7 @@ def register():
             error = "Password must be at least 6 characters long."
             return f.render_template('register.html', register_error=error)
         else:
-            users[new_username] = new_password
-            save_user_to_csv(new_username, new_password)
+            userdb.add_user(new_username,'admin',new_password)
             f.session['user'] = new_username
             return f.redirect(f.url_for('create_timetable'))
     return f.render_template('register.html')
@@ -188,7 +247,8 @@ def register():
 def forgot_password():
     if f.request.method == 'POST':
         email = f.request.form['email']
-        if email in users:
+        userdata = userdb.get_password(email)
+        if userdata[1]:
             token = os.urandom(16).hex()
             reset_tokens[token] = email
             message = f"A password reset link has been sent to the (simulated) email address: {email}. The link is: {f.url_for('reset_password', token=token, _external=True)}"
@@ -214,22 +274,13 @@ def reset_password(token):
         elif len(new_password) < 6:
             return f.render_template('reset_password_form.html', token=token, error="Password must be at least 6 characters long.")
         else:
-            for username, stored_email in users.items():
-                if stored_email == email:
-                    users[username] = new_password
-                    save_all_users_to_csv()
-                    del reset_tokens[token]
-                    return f.redirect(f.url_for('login'))
-            return f.render_template('message.html', message="Password reset successful. You can now log in.")
+            userdb.change_password(email,new_password=new_password)
+            del reset_tokens[token]
+            return f.redirect(f.url_for('login'))
+        return f.render_template('message.html', message="Password reset successful. You can now log in.")
 
     return f.render_template('reset_password_form.html', token=token)
 
-def save_all_users_to_csv():
-    with open(CSV_FILENAME, 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(['username', 'password'])
-        for username, password in users.items():
-            writer.writerow([username, password])
 
 #-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -282,7 +333,6 @@ def auto_create_timetable():
     return f.render_template('timetable_form_auto.html', timetable=timetable)
 
 #-----------------------------------------------------------------------------------------------------------------------------------
-
 # autoSave timetable
 
 @app.route('/timetable/autosave', methods=['POST'])

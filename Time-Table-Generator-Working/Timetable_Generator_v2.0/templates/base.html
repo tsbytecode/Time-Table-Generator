@@ -3,22 +3,22 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Timetable App{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style_3.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'Styles/style_6.css') }}">
 </head>
 <body>
     <button class="menu-toggle">&#8942;</button>
     <div class="sidebar">
         <h2 style="font-size: 24px;">Timetable App</h2>
-            <form method="GET" action="{{ url_for('create_timetable') }}" style="font-size: 20px; margin-left: 25px; margin-top: 20px;">
+            <form method="GET" action="{{ url_for('create_timetable') }}">
                 <button type="submit">Create/Edit</button>
             </form>
-            <form method="GET" action="{{ url_for('view_timetable') }}" style="font-size: 20px; margin-left: 25px; margin-top: 20px;">
+            <form method="GET" action="{{ url_for('view_timetable') }}">
                 <button type="submit">View Timetable</button>
             </form>
-            <form method="GET" action="{{ url_for('import_export') }}" style="font-size: 20px; margin-left: 25px; margin-top: 20px;">
+            <form method="GET" action="{{ url_for('import_export') }}">
                 <button type="submit">Export/Import</button>
             </form>
-            <form method="GET" action="{{ url_for('auto_create_timetable') }}" style="font-size: 20px; margin-left: 25px; margin-top: 20px;">
+            <form method="GET" action="{{ url_for('auto_create_timetable') }}">
                 <button type="submit">Auto Generate Timetable</button>
             </form>
         <br>

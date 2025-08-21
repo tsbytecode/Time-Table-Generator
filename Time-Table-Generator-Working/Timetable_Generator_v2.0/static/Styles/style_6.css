@@ -1,0 +1,288 @@
+/*
+ * Color Scheme: Modern Warm Dark Theme
+ * - Background: #1C1B23 (Deep charcoal)
+ * - Surfaces: #28272E (Dark gray)
+ * - Borders/Accents: #44434A (Slightly lighter gray)
+ * - Primary Text: #F2DFCB (Off-white/light beige)
+ * - Accent Colors: #C28B47 (Muted gold), #D4B4A1 (Light beige)
+ */
+
+body {
+    min-height: 100vh;
+    padding-left: 45px;
+    margin: 0px;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1C1B23; /* Deep charcoal background */
+    color: #F2DFCB; /* Off-white text for contrast */
+    overflow-x: hidden;
+    display: flex;
+    line-height: 1.7;
+}
+
+.header-container {
+    background-color: #28272E; /* Dark gray surface */
+    border: 4px solid #44434A; /* Slightly lighter gray border */
+    border-radius: 10px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    padding-top: 0px;
+}
+
+.main-header {
+    background-color: #28272E; /* Dark gray surface */
+    color: #F2DFCB; /* Off-white text */
+    padding: 0em 2.5em;
+    text-align: center;
+    margin-bottom: 0;
+    font-family: "Times New Roman", Times, serif;
+    font-weight: bold;
+    letter-spacing: 0.06em;
+    font-size: 1.3em;
+    line-height: 20px;
+}
+
+.user-info {
+    color: #F2DFCB; /* Off-white text */
+    font-weight: bold;
+    margin-left: 25px;
+}
+
+.toggle-password-img {
+    cursor: pointer;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+}
+
+.password-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #D4B4A1; /* Light beige accent for headings */
+    margin-top: 20px;
+    font-family: 'Georgia', serif;
+}
+
+p, label, a {
+    color: #F2DFCB;
+}
+
+a {
+    transition: color 0.3s ease;
+    color: #C28B47; /* Muted gold for links */
+}
+
+a:hover {
+    color: #F2DFCB; /* Off-white on hover */
+}
+
+button {
+    background-color: #44434A; /* Gray background for buttons */
+    color: #F2DFCB;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #C28B47; /* Muted gold on hover */
+    transform: scale(1.05);
+}
+
+input, select, .password-input-container, .timetable-entry, .form-group {
+    background-color: #28272E; /* Dark gray for inputs */
+    border: 2px solid #44434A;
+    color: #F2DFCB;
+    padding: 8px;
+    margin: 5px 0;
+    border-radius: 5px;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #C28B47; /* Muted gold for focus */
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.timetable-entry {
+    background-color: #28272E; /* Dark gray for entry backgrounds */
+    border: 2px solid #44434A;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.remove-slot {
+    background-color: #993333; /* A warm red for delete button */
+    color: #F2DFCB;
+}
+
+.remove-slot:hover {
+    background-color: #C14A4A; /* A bolder warm red on hover */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #28272E; /* Table background */
+    border: 4px solid #44434A; /* Table border */
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #44434A;
+    color: #F2DFCB;
+}
+
+th {
+    background-color: #44434A; /* Table header background */
+    color: #F2DFCB;
+    font-weight: bold;
+}
+
+tr:hover {
+    background-color: #31303A; /* Slightly different gray for hover */
+}
+
+.sidebar {
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: -250px;
+    height: 100%;
+    background-color: #1C1B23; /* Deep charcoal for sidebar */
+    color: #F2DFCB;
+    transition: left 0.3s ease;
+    padding-top: 60px;
+    z-index: 1000;
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+.sidebar h2 {
+    color: #D4B4A1;
+    font-family: "Times New Roman", Times, serif;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: center;
+    padding: 0 5px;
+    word-break: break-word;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0px;
+    margin: 20px;
+}
+
+.sidebar li {
+    margin-bottom: 10px;
+}
+
+.sidebar a {
+    display: block;
+    color: #F2DFCB;
+    text-decoration: none;
+    padding: 10px 5px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    word-break: break-word;
+    font-size: 1em;
+}
+
+.sidebar a:hover {
+    background-color: #31303A; /* Slightly different gray for hover */
+}
+
+/* This is the new rule to fix the sidebar button alignment */
+.sidebar form {
+    margin-left: 25px;
+    margin-top: 20px;
+    text-align: left;
+}
+
+.content {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+.menu-toggle {
+    position: fixed;
+    top: 15px;
+    left: 5px;
+    background: none;
+    border: none;
+    color: #F2DFCB;
+    font-size: 1.5em;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+
+.overlay.open {
+    visibility: visible;
+    opacity: 1;
+    transition-delay: 0s;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding-left: 0;
+    }
+    .content {
+        margin-left: 0;
+    }
+}
+
+.timetable-form-label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+/* New rule to align form elements */
+.form-row {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Adds space between label and input */
+    margin-bottom: 15px;
+}
+
+/* New rule to align timetable buttons */
+.button-row {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}

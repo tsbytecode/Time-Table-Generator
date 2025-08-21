@@ -1,18 +1,29 @@
+/*
+ * Color Scheme:
+ * - Main Base: Nord "Polar Night"
+ * - Text: Nord "Snow Storm"
+ * - Accents: Nord "Frost" & Rosé Pine "Accents"
+ */
+
+/* ==================================== */
+/* Nord & Rosé Pine Theme      */
+/* ==================================== */
+
 body {
     min-height: 100vh;
     padding-left: 45px;
     margin: 0px;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #1C1B23;
-    color: #F7F7F7;
+    background-color: #2E3440; /* Nord0 - Polar Night */
+    color: #E5E9F0; /* Nord5 - Snow Storm */
     overflow-x: hidden;
     display: flex;
     line-height: 1.7;
 }
 
 .header-container {
-    background-color: #28272E;
-    border: 4px solid #44434A;
+    background-color: #3B4252; /* Nord1 - Polar Night */
+    border: 4px solid #434C5E; /* Nord2 - Polar Night */
     border-radius: 10px;
     margin-bottom: 20px;
     overflow: hidden;
@@ -20,8 +31,8 @@ body {
 }
 
 .main-header {
-    background-color: #28272E;
-    color: #F7F7F7;
+    background-color: #3B4252; /* Nord1 - Polar Night */
+    color: #E5E9F0; /* Nord5 - Snow Storm */
     padding: 0em 2.5em;
     text-align: center;
     margin-bottom: 0;
@@ -33,7 +44,7 @@ body {
 }
 
 .user-info {
-    color: #F7F7F7;
+    color: #E5E9F0; /* Nord5 - Snow Storm */
     font-weight: bold;
     margin-left: 25px;
 }
@@ -54,26 +65,27 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    color: #FF5722;
+    color: #BF616A; /* Nord11 - Aurora (Red) */
     margin-top: 20px;
     font-family: 'Georgia', serif;
 }
 
 p, label, a {
-    color: #F7F7F7;
+    color: #E5E9F0; /* Nord5 - Snow Storm */
 }
 
 a {
     transition: color 0.3s ease;
+    color: #88C0D0; /* Nord8 - Frost (Blue) */
 }
 
 a:hover {
-    color: #673AB7;
+    color: #B48EAD; /* Nord15 - Aurora (Purple) */
 }
 
 button {
-    background-color: #FF5722;
-    color: #F7F7F7;
+    background-color: #5E81AC; /* Nord10 - Frost (Darker Blue) */
+    color: #E5E9F0; /* Nord5 - Snow Storm */
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
@@ -84,14 +96,14 @@ button {
 }
 
 button:hover {
-    background-color: #673AB7;
+    background-color: #81A1C1; /* Nord9 - Frost (Lighter Blue) */
     transform: scale(1.05);
 }
 
-input, select {
-    background-color: #28272E;
-    border: 2px solid #44434A;
-    color: #F7F7F7;
+input, select, .password-input-container, .timetable-entry, .form-group {
+    background-color: #434C5E; /* Nord2 - Polar Night */
+    border: 2px solid #4C566A; /* Nord3 - Polar Night */
+    color: #E5E9F0; /* Nord5 - Snow Storm */
     padding: 8px;
     margin: 5px 0;
     border-radius: 5px;
@@ -99,7 +111,7 @@ input, select {
 
 input:focus, select:focus {
     outline: none;
-    border-color: #FF5722;
+    border-color: #88C0D0; /* Nord8 - Frost (Blue) */
 }
 
 .form-group {
@@ -107,28 +119,28 @@ input:focus, select:focus {
 }
 
 .timetable-entry {
-    background-color: #28272E;
-    border: 2px solid #44434A;
+    background-color: #434C5E; /* Nord2 - Polar Night */
+    border: 2px solid #4C566A; /* Nord3 - Polar Night */
     padding: 15px;
     border-radius: 10px;
     margin-bottom: 15px;
 }
 
 .remove-slot {
-    background-color: #8A1D21;
-    color: #F7F7F7;
+    background-color: #BF616A; /* Nord11 - Aurora (Red) */
+    color: #E5E9F0; /* Nord5 - Snow Storm */
 }
 
 .remove-slot:hover {
-    background-color: #FF5722;
+    background-color: #D08770; /* Nord12 - Aurora (Orange) */
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
-    background-color: #28272E;
-    border: 4px solid #44434A;
+    background-color: #3B4252; /* Nord1 - Polar Night */
+    border: 4px solid #4C566A; /* Nord3 - Polar Night */
     border-radius: 10px;
     overflow: hidden;
 }
@@ -136,18 +148,18 @@ table {
 th, td {
     padding: 12px 15px;
     text-align: left;
-    border-bottom: 1px solid #44434A;
-    color: #F7F7F7;
+    border-bottom: 1px solid #4C566A; /* Nord3 - Polar Night */
+    color: #E5E9F0; /* Nord5 - Snow Storm */
 }
 
 th {
-    background-color: #673AB7;
-    color: #F7F7F7;
+    background-color: #5E81AC; /* Nord10 - Frost (Darker Blue) */
+    color: #E5E9F0; /* Nord5 - Snow Storm */
     font-weight: bold;
 }
 
 tr:hover {
-    background-color: #31303A;
+    background-color: #434C5E; /* Nord2 - Polar Night */
 }
 
 .sidebar {
@@ -156,8 +168,8 @@ tr:hover {
     top: 0;
     left: -250px;
     height: 100%;
-    background-color: #181818;
-    color: #F7F7F7;
+    background-color: #2E3440; /* Nord0 - Polar Night */
+    color: #E5E9F0; /* Nord5 - Snow Storm */
     transition: left 0.3s ease;
     padding-top: 60px;
     z-index: 1000;
@@ -168,12 +180,11 @@ tr:hover {
 }
 
 .sidebar h2 {
-    color: #FFEB3B;
+    color: #EBCB8B; /* Nord13 - Aurora (Yellow) */
     font-family: "Times New Roman", Times, serif;
     margin-top: 5px;
     margin-bottom: 20px;
     font-size: 1.5em;
-    font-family: "Times New Roman", Times, serif;
     font-weight: bold;
     text-align: center;
     padding: 0 5px;
@@ -192,7 +203,7 @@ tr:hover {
 
 .sidebar a {
     display: block;
-    color: #F7F7F7;
+    color: #E5E9F0; /* Nord5 - Snow Storm */
     text-decoration: none;
     padding: 10px 5px;
     border-radius: 5px;
@@ -202,7 +213,7 @@ tr:hover {
 }
 
 .sidebar a:hover {
-    background-color: #31303A;
+    background-color: #4C566A; /* Nord3 - Polar Night */
 }
 
 .content {
@@ -216,7 +227,7 @@ tr:hover {
     left: 5px;
     background: none;
     border: none;
-    color: #F7F7F7;
+    color: #E5E9F0; /* Nord5 - Snow Storm */
     font-size: 1.5em;
     cursor: pointer;
     z-index: 1001;
@@ -254,4 +265,25 @@ tr:hover {
     display: block;
     margin-top: 15px;
     font-weight: bold;
+}
+
+.sidebar form {
+    margin-left: 25px;
+    margin-top: 20px;
+    text-align: left;
+}
+
+/* New rule to align form elements */
+.form-row {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Adds space between label and input */
+    margin-bottom: 15px;
+}
+
+/* New rule to align timetable buttons */
+.button-row {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
 }

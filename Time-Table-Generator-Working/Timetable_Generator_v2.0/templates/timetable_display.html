@@ -25,55 +25,46 @@
                 {% endfor %}
             </tbody>
         </table>
+        
+        <div class="button-row">
+            <form method="GET" action="{{ url_for('create_timetable') }}">
+                <button type="submit">Edit Timetable</button>
+            </form>
+            <form method="GET" action="{{ url_for('export_timetable') }}">
+                <button type="submit">Export as CSV</button>
+            </form>
+            <form method="GET" action="{{ url_for('import_timetable') }}">
+                <button type="submit">Import CSV</button>
+            </form>
+        </div>
 
-        <h4 style="display: inline-block; margin-right: 5px;"></h4>
-        <form method="GET" action="{{ url_for('create_timetable') }}" style="display: inline-block;">
-            <button type="submit">Edit Timetable</button>
-        </form>
-
-        <h4 style="display: inline-block; margin-right: 5px;"></h4>
-        <form method="GET" action="{{ url_for('export_timetable') }}" style="display: inline-block;">
-            <button type="submit">Export as CSV</button>
-        </form>
-
-        <h4 style="display: inline-block; margin-right: 5px;"></h4>
-        <form method="GET" action="{{ url_for('import_timetable') }}" style="display: inline-block;">
-            <button type="submit">Import CSV</button>
-        </form>
-
-        <h4 style="display: inline-block; margin-right: 5px;"></h4>
-        <form method="POST" action="{{ url_for('save_timetable_to_db') }}" style="display: inline-block;">
-            <label for = "class">Enter Class:</label>
-            <input type="text" id="class" name="class">
-            <button type="submit">Save</button>
-        </form>
-
-        <h4 style="display: inline-block; margin-right: 5px;"></h4>
-        <form method="POST" action="{{ url_for('get_timetable_from_db') }}" style="display: inline-block;">
-            <label for = "class">Enter Class:</label>
-            <input type="text" id="class" name="class">
-            <button type="submit">Load Timetable</button>
-        </form>
-
+        <div class="button-row">
+            <form method="POST" action="{{ url_for('save_timetable_to_db') }}">
+                <label for="class">Enter Class:</label>
+                <input type="text" id="class" name="class">
+                <button type="submit">Save</button>
+            </form>
+            <form method="POST" action="{{ url_for('get_timetable_from_db') }}">
+                <label for="class">Enter Class:</label>
+                <input type="text" id="class" name="class">
+                <button type="submit">Load Timetable</button>
+            </form>
+        </div>
 
     {% else %}
-
         <h4 style="display: inline-block; margin-right: 20px;">No timetable entries yet.</h4>
-        <form method="GET" action="{{ url_for('create_timetable') }}" style="display: inline-block;">
-            <button type="submit">Create Timetable</button>
-        </form>
-            
-        <h4 style="display: inline-block; margin-right: 5px;"></h4>
-        <form method="GET" action="{{ url_for('import_timetable') }}" style="display: inline-block;">
-            <button type="submit">Import CSV</button>
-        </form>
-        
-        <h4 style="display: inline-block; margin-right: 5px;"></h4>
-        <form method="POST" action="{{ url_for('get_timetable_from_db') }}" style="display: inline-block;">
-            <label for = "class">Enter Class:</label>
-            <input type="text" id="class" name="class"><br><br>
-            <button type="submit">Load Timetable</button>
-        </form>
-
+        <div class="button-row">
+            <form method="GET" action="{{ url_for('create_timetable') }}">
+                <button type="submit">Create Timetable</button>
+            </form>
+            <form method="GET" action="{{ url_for('import_timetable') }}">
+                <button type="submit">Import CSV</button>
+            </form>
+            <form method="POST" action="{{ url_for('get_timetable_from_db') }}">
+                <label for="class">Enter Class:</label>
+                <input type="text" id="class" name="class">
+                <button type="submit">Load Timetable</button>
+            </form>
+        </div>
     {% endif %}
 {% endblock %}

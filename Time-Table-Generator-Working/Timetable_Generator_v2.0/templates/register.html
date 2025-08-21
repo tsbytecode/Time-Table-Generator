@@ -13,12 +13,12 @@
         <div class="password-input-container">
             <label for="new_password">Password:</label>
             <input type="password" id="new_password" name="new_password" required>
-            <img src="{{ url_for('static', filename='eye_closed.png') }}" alt="Show Password" class="toggle-password-img" id="togglePasswordRegisterNewImg">
+            <img src="{{ url_for('static', filename='Eyes_Pictures/eye_closed.png') }}" alt="Show Password" class="toggle-password-img" id="togglePasswordRegisterNewImg">
         </div>
         <div class="password-input-container">
             <label for="confirm_password">Confirm Password:</label>
             <input type="password" id="confirm_password" name="confirm_password" required>
-            <img src="{{ url_for('static', filename='eye_closed.png') }}" alt="Show Password" class="toggle-password-img" id="togglePasswordRegisterConfirmImg">
+            <img src="{{ url_for('static', filename='Eyes_Pictures/eye_closed.png') }}" alt="Show Password" class="toggle-password-img" id="togglePasswordRegisterConfirmImg">
         </div>
         <button type="submit">Register</button>
     </form>
@@ -31,8 +31,8 @@
         const togglePasswordRegisterNewImg = document.getElementById('togglePasswordRegisterNewImg');
         const confirmPasswordInputRegister = document.getElementById('confirm_password');
         const togglePasswordRegisterConfirmImg = document.getElementById('togglePasswordRegisterConfirmImg');
-        const closedEyeSrcRegister = "{{ url_for('static', filename='eye_closed.png') }}";
-        const openEyeSrcRegister = "{{ url_for('static', filename='eye_open.png') }}";
+        const closedEyeSrcRegister = "{{ url_for('static', filename='Eyes_Pictures/eye_closed.png') }}";
+        const openEyeSrcRegister = "{{ url_for('static', filename='Eyes_Pictures/eye_open.png') }}";
 
         togglePasswordRegisterNewImg.addEventListener('click', function() {
             const type = newPasswordInputRegister.getAttribute('type');

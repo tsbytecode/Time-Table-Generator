@@ -12,9 +12,10 @@
 
     <h3>Import Timetable</h3>
     <form method="POST" action="{{ url_for('import_timetable') }}" enctype="multipart/form-data">
+    <div class="form-row">
         <label for="csv_file">Choose CSV file to import:</label>
         <input type="file" name="csv_file" id="csv_file" accept=".csv" required>
-        <br><br>
-        <button type="submit">Import Timetable</button>
+    </div>
+    <button type="submit">Import Timetable</button>
     </form>
 {% endblock %}

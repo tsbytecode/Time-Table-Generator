@@ -286,3 +286,24 @@ footer a {
         padding: 10px;
     }
 }
+
+.sidebar form {
+    margin-left: 25px;
+    margin-top: 20px;
+    text-align: left;
+}
+
+/* New rule to align form elements */
+.form-row {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Adds space between label and input */
+    margin-bottom: 15px;
+}
+
+/* New rule to align timetable buttons */
+.button-row {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}

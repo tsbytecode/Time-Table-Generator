@@ -90,7 +90,7 @@ class UserDBManager:
             self.conn.close()
             print("Database connection closed.")
 
-userdb_path = "Timetable_Generator_v2.0/users.db"
+userdb_path = "users.db"
 userdb = UserDBManager(userdb_path)
 
 #=====================================================================================================================================
@@ -99,7 +99,7 @@ userdb = UserDBManager(userdb_path)
 
 BASE_URL = "http://localhost:8080"
 
-timetabledb = sql.connect('Timetable_Generator_v2.0/algo/x.db',check_same_thread=False)
+timetabledb = sql.connect('algo/x.db',check_same_thread=False)
 
 
 def create_assignment(teacher_id: str, class_id: str, periods_needed: int,subject:str):

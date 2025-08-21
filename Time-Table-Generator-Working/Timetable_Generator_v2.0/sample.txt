@@ -1,0 +1,1 @@
+[{'day':'Monday','time':'8:30-9:10','subject':'math','teacher':'Manchanda' }, {'day':'Monday','time':'930-1010','subject':'math','teacher':'Manchanda'}, {'day':'Monday','time':'8:30-9-10','subject':'math','teacher':'Manchanda'}]

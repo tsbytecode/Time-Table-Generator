@@ -30,6 +30,9 @@
                     <label for="teacher_0">Teacher:</label>
                     <input type="text" name="teacher_0" id="teacher_0" required>
                     
+                    <label for="subject_0">Subject:</label>
+                    <input type="text" name="subject_0" id="subject_0" required>
+
                     <label for="num_classes_0">Number of Classes:</label>
                     <input type="number" name="num_classes_0" id="num_classes_0" min="1" required>
 
@@ -55,6 +58,10 @@
                     <label for="teacher_${counter}">Teacher:</label>
                     <input type="text" name="teacher_${counter}" id="teacher_${counter}" required>
                     
+                    <label for="subject_${counter}">Subject:</label>
+                    <input type="text" name="subject_${counter}" id="subject_${counter}" required>
+                    
+
                     <label for="num_classes_${counter}">Number of Classes:</label>
                     <input type="number" name="num_classes_${counter}" id="num_classes_${counter}" min="1" required>
 
@@ -74,6 +81,7 @@
                 const entries = document.querySelectorAll('.timetable-entry');
                 entries.forEach((entry, index) => {
                     entry.querySelector('input[name^="teacher_"]').name = `teacher_${index}`;
+                    entry.querySelector('input[name^="subject_"]').name = `subject_${index}`;
                     entry.querySelector('input[name^="num_classes_"]').name = `num_classes_${index}`;
                 });
             });

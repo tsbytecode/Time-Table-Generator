@@ -1,1 +1,77 @@
-[{'day':'Monday','time':'8:30-9:10','subject':'math','teacher':'Manchanda' }, {'day':'Monday','time':'930-1010','subject':'math','teacher':'Manchanda'}, {'day':'Monday','time':'8:30-9-10','subject':'math','teacher':'Manchanda'}]
+darshan 
+
+# Dummy database connection function
+def get_db_connection():
+    # Replace 'your_database_path.db' with the actual path to your database file
+    conn = sql.connect('your_database_path.db')
+    conn.row_factory = sql.Row  # This allows you to access columns by name
+    return conn
+
+# Helper function to convert app's day format to DB's day format
+def convert_day_to_db(day_name):
+    day_map = {
+        'Monday': 'mon',
+        'Tuesday': 'tue',
+        'Wednesday': 'wed',
+        'Thursday': 'thu',
+        'Friday': 'fri'
+    }
+    return day_map.get(day_name, '')
+
+# Helper function to convert app's time format to DB's period number
+def convert_time_to_periodno(time_slot):
+    period_map = {
+        '8:50 - 9:30': 1,
+        '9:30 - 10:10': 2,
+        '10:20 - 11:00': 3,
+        '11:00 - 11:40': 4,
+        '11:40 - 12:20': 5,
+        '12:50 - 13:30': 6,
+        '13:30 - 14:10': 7,
+        '14:10 - 14:50': 8,
+        '14:50 - 15:30': 9
+    }
+    return period_map.get(time_slot, 0)
+
+
+@app.route('/timetable/add', methods=['POST'])
+def add_timetable_to_db():
+    # Make sure the user is logged in and there is a timetable in the session
+    if 'user' not in f.session or 'timetable' not in f.session:
+        return f.redirect(f.url_for('login'))
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Get the timetable from the session
+    imported_timetable = f.session.get('timetable', [])
+    if not imported_timetable:
+        return "No timetable data found in session.", 400
+
+    # Assume all periods in the session timetable belong to the same class
+    class_id = imported_timetable[0].get('classID')
+    if not class_id:
+        return "Timetable data is missing class ID.", 400
+
+    # Clear existing data for the class to prevent duplicates
+    cursor.execute("DELETE FROM periods WHERE classID = ?", (class_id,))
+
+    # Insert new timetable data
+    for period in imported_timetable:
+        db_day = convert_day_to_db(period.get('day'))
+        db_period_no = convert_time_to_periodno(period.get('time'))
+        
+        # Ensure data is valid before insertion
+        if not all([db_day, db_period_no, period.get('subject'), period.get('teacherid')]):
+            # Skip invalid periods or handle the error as needed
+            continue
+
+        cursor.execute(
+            "INSERT INTO periods (classID, day, periodno, subject, teacherid) VALUES (?, ?, ?, ?, ?)",
+            (class_id, db_day, db_period_no, period.get('subject'), period.get('teacherid'))
+        )
+
+    conn.commit()
+    conn.close()
+    
+    return f.redirect(f.url_for('view_timetable'))

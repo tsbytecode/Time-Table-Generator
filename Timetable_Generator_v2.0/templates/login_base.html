@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Timetable App{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'Styles/style_6.css') }}">
+</head>
+<body>
+    <div class="content">
+        <div class="header-container">
+            <header class="main-header">
+                <h1>Timetable Generator</h1>
+            </header>
+        </div>
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+        <footer>
+            <p><a href="{{ url_for('the_creators') }}" style="color: #F2DFCB; text-decoration: none;">Timetable App by Tushar, Darshan and Raj</a></p>
+        </footer>
+    </div>
+    <div class="overlay"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const content = document.querySelector('.content');
+            const overlay = document.querySelector('.overlay');
+
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('open');
+            });
+
+            overlay.addEventListener('click', function() {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('open');
+            });
+        });
+    </script>
+</body>
+</html>

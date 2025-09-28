@@ -21,23 +21,5 @@
     </div>
     <div class="overlay"></div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const menuToggle = document.querySelector('.menu-toggle');
-            const sidebar = document.querySelector('.sidebar');
-            const content = document.querySelector('.content');
-            const overlay = document.querySelector('.overlay');
-
-            menuToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('open');
-                overlay.classList.toggle('open');
-            });
-
-            overlay.addEventListener('click', function() {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('open');
-            });
-        });
-    </script>
 </body>
 </html>

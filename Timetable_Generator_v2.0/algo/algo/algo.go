@@ -127,6 +127,10 @@ func GenerateTimetable(d *DBconn) {
 }
 
 func (d *DBconn) GenerateClass(classID string) bool {
+	_, err := d.conn.Exec("DELETE FROM periods WHERE classid = ?", classID)
+	if err != nil {
+		panic(err)
+	}
 	return d.Assignperiod(classID, "mon", 1, false)
 }
 

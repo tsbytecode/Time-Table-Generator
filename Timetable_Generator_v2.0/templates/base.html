@@ -2,13 +2,13 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Timetable App{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename = 'Styles/style_3.css') }}">
+    <title>{% block title %}TIMEGEN{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'Styles/style_6.css') }}">
 </head>
 <body>
     <button class="menu-toggle">&#8942;</button>
     <div class="sidebar">
-        <h2 style="font-size: 24px;">Timetable App</h2>
+        <h2 style="font-size: 24px;">TIMEGEN</h2>
             <form method="GET" action="{{ url_for('create_timetable') }}">
                 <button type="submit">Create/Edit</button>
             </form>
@@ -36,7 +36,7 @@
     <div class="content">
         <div class="header-container">
             <header class="main-header">
-                <h1>Timetable Generator</h1>
+                <h1>TIMEGEN</h1>
             </header>
         </div>
         <main>

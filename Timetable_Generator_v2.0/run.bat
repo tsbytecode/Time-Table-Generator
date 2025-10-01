@@ -1,7 +1,7 @@
 @echo off
 REM --- SETTINGS ---
 SET EXECUTABLE_PATH="./main.exe"
-SET PYTHON_SCRIPT="./app.py"
+SET PYTHON_SCRIPT="app.py"
 SET PYTYHON_COMAND
 
 echo Starting the executable...
@@ -16,7 +16,7 @@ echo.
 
 REM Ensure 'python' is in your system's PATH.
 REM You can use 'py' instead of 'python' on some Windows systems.
-%PYTYHON_COMAND% %PYTHON_SCRIPT%
+python3 %PYTHON_SCRIPT%
 
 echo.
 echo Script execution complete. Press any key to exit.

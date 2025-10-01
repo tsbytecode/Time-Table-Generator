@@ -99,7 +99,7 @@ userdb = UserDBManager(userdb_path)
 
 BASE_URL = "http://localhost:8080"
 
-timetabledb = sql.connect('algo/x.db',check_same_thread=False)
+timetabledb = sql.connect('x.db',check_same_thread=False)
 
 
 def create_assignment(teacher_id: str, class_id: str, periods_needed: int,subject:str):

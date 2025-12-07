@@ -9,11 +9,8 @@ import (
 	"os"
 )
 
-// The AssignmentRequest struct is used to decode the JSON request body.
-// It uses exported fields and JSON tags so that it can be handled by the
-// `encoding/json` package. This is necessary because the `algo.Assignment`
-// struct has an unexported field (`periodsused`), which cannot be accessed
-// by the JSON decoder.
+// AssignmentRequest defines the structure for incoming JSON requests to create a new assignment.
+// It includes the teacher's ID, the class's ID, the subject, and the number of periods required.
 type AssignmentRequest struct {
 	TeacherID     string `json:"teacher_id"`
 	ClassID       string `json:"class_id"`
@@ -21,8 +18,8 @@ type AssignmentRequest struct {
 	Periodsneeded int    `json:"periods_needed"`
 }
 
-// The ResponseMessage struct is a standard way to send a JSON response
-// back to the client.
+// ResponseMessage defines a standard JSON response structure.
+// It provides feedback to the client on the status of their request.
 type ResponseMessage struct {
 	Status  string `json:"status"`
 	Message string `json:"message,omitempty"`
@@ -30,9 +27,13 @@ type ResponseMessage struct {
 
 var dbConn *algo.DBconn
 
-// newAssignmentHandler handles POST requests to create a new assignment.
-// It decodes the JSON request, creates an `algo.Assignment` instance,
-// and calls the appropriate method on the `algo.DBconn` object.
+// newAssignmentHandler handles HTTP POST requests to create a new assignment.
+// It decodes the JSON request body into an AssignmentRequest struct, validates the input,
+// and then creates a new assignment in the database.
+//
+// Parameters:
+//   w: http.ResponseWriter to write the HTTP response.
+//   r: *http.Request representing the incoming HTTP request.
 func newAssignmentHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r)
 	if r.Method != "POST" {
@@ -75,9 +76,13 @@ func newAssignmentHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(ResponseMessage{Status: "success", Message: "Assignment created successfully"})
 }
 
-// generateClassHandler handles POST requests to generate a class timetable.
-// It decodes the JSON request and calls the `GenerateClass` method from
-// the `algo` package.
+// generateClassHandler handles HTTP POST requests to generate a class timetable.
+// It decodes a JSON request containing a class ID and calls the GenerateClass method
+// to create the timetable.
+//
+// Parameters:
+//   w: http.ResponseWriter to write the HTTP response.
+//   r: *http.Request representing the incoming HTTP request.
 func generateClassHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -109,6 +114,9 @@ func generateClassHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// main is the entry point of the application.
+// It initializes the database connection, sets up the HTTP handlers,
+// and starts the web server.
 func main() {
 	var err error
 	dbConn, err = algo.NewDBconn(false, "x.db")

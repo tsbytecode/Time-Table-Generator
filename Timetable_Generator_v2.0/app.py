@@ -1,6 +1,6 @@
-#=====================================================================================================================================
-#Imports
-#=====================================================================================================================================
+# =====================================================================================================================================
+# Imports
+# =====================================================================================================================================
 
 import flask as f
 import csv
@@ -11,13 +11,14 @@ import json
 import sqlite3 as sql
 
 app = f.Flask(__name__)
-app.secret_key = 'code'
+app.secret_key = "code"
 
-#=====================================================================================================================================
-#users sql
-#=====================================================================================================================================
+# =====================================================================================================================================
+# users sql
+# =====================================================================================================================================
 
 reset_tokens = {}
+
 
 class UserDBManager:
     """Manages user data in the SQLite database."""
@@ -30,16 +31,20 @@ class UserDBManager:
         """
         try:
             self.conn = sql.connect(path, check_same_thread=False)
-            self.conn.execute("""
+            self.conn.execute(
+                """
                 CREATE TABLE IF NOT EXISTS users (
                     userid TEXT,
                     level TEXT,
                     password TEXT,
                     PRIMARY KEY(userid, level)
                 )
-            """)
+            """
+            )
             self.conn.commit()
-            print("Successfully connected to the database and ensured 'users' table exists.")
+            print(
+                "Successfully connected to the database and ensured 'users' table exists."
+            )
         except sql.Error as e:
             print(f"Database connection error: {e}")
             self.conn = None
@@ -54,16 +59,18 @@ class UserDBManager:
             tuple: A tuple containing the password (str) and a boolean indicating success.
         """
         if not self.conn:
-            print('conn failed')
+            print("conn failed")
             return (None, False)
         try:
-            cursor = self.conn.execute("SELECT password FROM users WHERE userid = ?", (userid,))
+            cursor = self.conn.execute(
+                "SELECT password FROM users WHERE userid = ?", (userid,)
+            )
             results = cursor.fetchall()
             if results:
                 print(results, results[0][0])
                 return (results[0][0], True)
             else:
-                print(userid,results)
+                print(userid, results)
                 return (None, False)
         except sql.Error as e:
             print(f"Error fetching password: {e}")
@@ -83,7 +90,10 @@ class UserDBManager:
         if not self.conn:
             return False
         try:
-            self.conn.execute("INSERT INTO users (userid, level, password) VALUES (?, ?, ?)", (userid, level, password))
+            self.conn.execute(
+                "INSERT INTO users (userid, level, password) VALUES (?, ?, ?)",
+                (userid, level, password),
+            )
             self.conn.commit()
             print(f"User '{userid}' added successfully.")
             return True
@@ -107,7 +117,9 @@ class UserDBManager:
         if not self.conn:
             return False
         try:
-            cursor = self.conn.execute("UPDATE users SET password = ? WHERE userid = ?", (new_password, userid))
+            cursor = self.conn.execute(
+                "UPDATE users SET password = ? WHERE userid = ?", (new_password, userid)
+            )
             self.conn.commit()
             if cursor.rowcount > 0:
                 print(f"Password for user '{userid}' changed successfully.")
@@ -125,19 +137,22 @@ class UserDBManager:
             self.conn.close()
             print("Database connection closed.")
 
+
 userdb_path = "users.db"
 userdb = UserDBManager(userdb_path)
 
-#=====================================================================================================================================
-#sql lite
-#=====================================================================================================================================
+# =====================================================================================================================================
+# sql lite
+# =====================================================================================================================================
 
 BASE_URL = "http://localhost:8080"
 
-timetabledb = sql.connect('x.db',check_same_thread=False)
+timetabledb = sql.connect("x.db", check_same_thread=False)
 
 
-def create_assignment(teacher_id: str, class_id: str, periods_needed: int,subject:str):
+def create_assignment(
+    teacher_id: str, class_id: str, periods_needed: int, subject: str
+):
     """Sends a request to the Go service to create a new assignment.
 
     Args:
@@ -154,7 +169,7 @@ def create_assignment(teacher_id: str, class_id: str, periods_needed: int,subjec
         "teacher_id": teacher_id,
         "class_id": class_id,
         "periods_needed": int(periods_needed),
-        "subject" : subject
+        "subject": subject,
     }
     headers = {"Content-Type": "application/json"}
     print(payload)
@@ -165,6 +180,7 @@ def create_assignment(teacher_id: str, class_id: str, periods_needed: int,subjec
         return response.json()
     except requests.exceptions.RequestException as e:
         return {"status": "error", "message": str(e)}
+
 
 def generate_timetable(class_id: str):
     """Sends a request to the Go service to generate a timetable for a given class.
@@ -187,81 +203,95 @@ def generate_timetable(class_id: str):
         return {"status": "error", "message": str(e)}
 
 
-#=====================================================================================================================================
-#Main pages
-#=====================================================================================================================================
+# =====================================================================================================================================
+# Main pages
+# =====================================================================================================================================
 
-#Home page --> Login page
+# Home page --> Login page
 
-@app.route('/', methods=['GET', 'POST'])
+
+@app.route("/", methods=["GET", "POST"])
 def home():
     """Redirects to the login page."""
-    f.session.pop('user', None)
-    return f.redirect(f.url_for('login'))
+    f.session.pop("user", None)
+    return f.redirect(f.url_for("login"))
 
-@app.route('/login', methods=['GET', 'POST'])
+
+@app.route("/login", methods=["GET", "POST"])
 def login():
     """Handles user login."""
-    if 'user' not in f.session:
-        if f.request.method == 'POST':
-            username = f.request.form['username']
-            password = f.request.form['password']
+    if "user" not in f.session:
+        if f.request.method == "POST":
+            username = f.request.form["username"]
+            password = f.request.form["password"]
             userdata = userdb.get_password(username)
             print(userdata)
             if userdata[1]:
                 if userdata[0] == password:
-                    f.session['user'] = username
-                    return f.redirect(f.url_for('create_timetable'))
+                    f.session["user"] = username
+                    return f.redirect(f.url_for("create_timetable"))
                 else:
-                    return f.render_template('login.html', login_error = "Incorrect Password")
+                    return f.render_template(
+                        "login.html", login_error="Incorrect Password"
+                    )
             else:
-                return f.render_template('login.html', login_error = "User does not exist")
-        return f.render_template('login.html')
+                return f.render_template(
+                    "login.html", login_error="User does not exist"
+                )
+        return f.render_template("login.html")
     else:
-        return f.redirect(f.url_for('create_timetable'))
+        return f.redirect(f.url_for("create_timetable"))
 
-#-----------------------------------------------------------------------------------------------------------------------------------
 
-@app.route('/register', methods=['GET', 'POST'])
+# -----------------------------------------------------------------------------------------------------------------------------------
+
+
+@app.route("/register", methods=["GET", "POST"])
 def register():
     """Handles user registration."""
-    if f.request.method == 'POST':
-        new_username = f.request.form['new_username']
-        new_password = f.request.form['new_password']
-        confirm_password = f.request.form['confirm_password']
+    if f.request.method == "POST":
+        new_username = f.request.form["new_username"]
+        new_password = f.request.form["new_password"]
+        confirm_password = f.request.form["confirm_password"]
         userdata = userdb.get_password(new_username)
         if userdata[1]:
             error = "Username already exists."
-            return f.render_template('register.html', register_error=error)
+            return f.render_template("register.html", register_error=error)
         elif new_password != confirm_password:
             error = "Passwords do not match."
-            return f.render_template('register.html', register_error=error)
+            return f.render_template("register.html", register_error=error)
         elif len(new_password) < 6:
             error = "Password must be at least 6 characters long."
-            return f.render_template('register.html', register_error=error)
+            return f.render_template("register.html", register_error=error)
         else:
-            userdb.add_user(new_username,'admin',new_password)
-            f.session['user'] = new_username
-            return f.redirect(f.url_for('create_timetable'))
-    return f.render_template('register.html')
+            userdb.add_user(new_username, "admin", new_password)
+            f.session["user"] = new_username
+            return f.redirect(f.url_for("create_timetable"))
+    return f.render_template("register.html")
 
-@app.route('/forgot_password', methods=['GET', 'POST'])
+
+@app.route("/forgot_password", methods=["GET", "POST"])
 def forgot_password():
     """Handles the forgot password process."""
-    if f.request.method == 'POST':
-        email = f.request.form['email']
+    if f.request.method == "POST":
+        email = f.request.form["email"]
         userdata = userdb.get_password(email)
         if userdata[1]:
             token = os.urandom(16).hex()
             reset_tokens[token] = email
             message = f"A password reset link has been sent to the (simulated) email address: {email}. The link is: {f.url_for('reset_password', token=token, _external=True)}"
-            return f.render_template('forgot_password.html', forgot_password_message=message)
+            return f.render_template(
+                "forgot_password.html", forgot_password_message=message
+            )
         else:
             error = "Username (as email proxy) not found."
-            return f.render_template('forgot_password.html', forgot_password_error=error)
-    return f.render_template('forgot_password.html')
+            return f.render_template(
+                "forgot_password.html", forgot_password_error=error
+            )
+    return f.render_template("forgot_password.html")
 
-@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+
+@app.route("/reset_password/<token>", methods=["GET", "POST"])
 def reset_password(token):
     """Handles the password reset process.
 
@@ -269,85 +299,99 @@ def reset_password(token):
         token (str): The password reset token.
     """
     if token not in reset_tokens:
-        return f.render_template('message.html', message="Invalid or expired reset link.")
+        return f.render_template(
+            "message.html", message="Invalid or expired reset link."
+        )
     email = reset_tokens[token]
-    if f.request.method == 'POST':
-        new_password = f.request.form['new_password']
-        confirm_password = f.request.form['confirm_password']
+    if f.request.method == "POST":
+        new_password = f.request.form["new_password"]
+        confirm_password = f.request.form["confirm_password"]
         if new_password != confirm_password:
-            return f.render_template('reset_password_form.html', token=token, error="Passwords do not match.")
+            return f.render_template(
+                "reset_password_form.html", token=token, error="Passwords do not match."
+            )
         elif len(new_password) < 6:
-            return f.render_template('reset_password_form.html', token=token, error="Password must be at least 6 characters long.")
+            return f.render_template(
+                "reset_password_form.html",
+                token=token,
+                error="Password must be at least 6 characters long.",
+            )
         else:
-            userdb.change_password(email,new_password=new_password)
+            userdb.change_password(email, new_password=new_password)
             del reset_tokens[token]
-            return f.redirect(f.url_for('login'))
-        return f.render_template('message.html', message="Password reset successful. You can now log in.")
+            return f.redirect(f.url_for("login"))
+        return f.render_template(
+            "message.html", message="Password reset successful. You can now log in."
+        )
 
-    return f.render_template('reset_password_form.html', token=token)
+    return f.render_template("reset_password_form.html", token=token)
 
 
-#-----------------------------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------------------
 
-#Logout
+# Logout
 
-@app.route('/logout')
+
+@app.route("/logout")
 def logout():
     """Logs the user out and clears the session."""
     f.session.clear()
-    return f.redirect(f.url_for('login'))
+    return f.redirect(f.url_for("login"))
 
-#-----------------------------------------------------------------------------------------------------------------------------------
 
-#Create timetable
+# -----------------------------------------------------------------------------------------------------------------------------------
 
-@app.route('/timetable/create')
+# Create timetable
+
+
+@app.route("/timetable/create")
 def create_timetable():
     """Renders the timetable creation form."""
-    if 'user' not in f.session:
-        return f.redirect(f.url_for('login'))
-    timetable = f.session.get('timetable', [])
-    return f.render_template('timetable_form.html', timetable=timetable)
+    if "user" not in f.session:
+        return f.redirect(f.url_for("login"))
+    timetable = f.session.get("timetable", [])
+    return f.render_template("timetable_form.html", timetable=timetable)
 
-#-----------------------------------------------------------------------------------------------------------------------------------
 
-#Save timetable
+# -----------------------------------------------------------------------------------------------------------------------------------
 
-@app.route('/timetable/save', methods=['POST'])
+# Save timetable
+
+
+@app.route("/timetable/save", methods=["POST"])
 def save_timetable():
     """Saves the manually created timetable data to the session."""
-    if 'user' not in f.session:
-        return f.redirect(f.url_for('login'))
+    if "user" not in f.session:
+        return f.redirect(f.url_for("login"))
     timetable_data = []
     for key, value in f.request.form.items():
-        if key.startswith('day_'):
-            index = key.split('_')[1]
+        if key.startswith("day_"):
+            index = key.split("_")[1]
             day = value
-            time = f.request.form.get(f'time_{index}')
-            subject = f.request.form.get(f'subject_{index}')
-            teacher = f.request.form.get(f'teacher_{index}', '')
+            time = f.request.form.get(f"time_{index}")
+            subject = f.request.form.get(f"subject_{index}")
+            teacher = f.request.form.get(f"teacher_{index}", "")
             if time and subject and day:
-                timetable_data.append({
-                    'day': day,
-                    'time': time,
-                    'subject': subject,
-                    'teacher': teacher
-                    })
-    f.session['timetable'] = timetable_data
-    return f.redirect(f.url_for('view_timetable'))
+                timetable_data.append(
+                    {"day": day, "time": time, "subject": subject, "teacher": teacher}
+                )
+    f.session["timetable"] = timetable_data
+    return f.redirect(f.url_for("view_timetable"))
 
-#Auto Create timetable
 
-@app.route('/timetable/autocreate')
+# Auto Create timetable
+
+
+@app.route("/timetable/autocreate")
 def auto_create_timetable():
     """Renders the form for automatic timetable creation."""
-    if 'user' not in f.session:
-        return f.redirect(f.url_for('login'))
-    timetable = f.session.get('timetable', [])
-    return f.render_template('timetable_form_auto.html', timetable=timetable)
+    if "user" not in f.session:
+        return f.redirect(f.url_for("login"))
+    timetable = f.session.get("timetable", [])
+    return f.render_template("timetable_form_auto.html", timetable=timetable)
 
 
-#-----------------------------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------------------
 # Auto Save timetable
 
 
@@ -362,13 +406,14 @@ def convert_day_to_db(day_name):
         str: The abbreviated day name.
     """
     day_map = {
-        'Monday': 'mon',
-        'Tuesday': 'tue',
-        'Wednesday': 'wed',
-        'Thursday': 'thu',
-        'Friday': 'fri'
+        "Monday": "mon",
+        "Tuesday": "tue",
+        "Wednesday": "wed",
+        "Thursday": "thu",
+        "Friday": "fri",
     }
-    return day_map.get(day_name, '')
+    return day_map.get(day_name, "")
+
 
 # Helper function to convert app's time format to DB's period number
 def convert_time_to_periodno(time_slot):
@@ -381,72 +426,70 @@ def convert_time_to_periodno(time_slot):
         int: The corresponding period number.
     """
     period_map = {
-        '8:50 - 9:30': 1,
-        '9:30 - 10:10': 2,
-        '10:20 - 11:00': 3,
-        '11:00 - 11:40': 4,
-        '11:40 - 12:20': 5,
-        '12:50 - 13:30': 6,
-        '13:30 - 14:10': 7,
-        '14:10 - 14:50': 8,
-        '14:50 - 15:30': 9
+        "8:50 - 9:30": 1,
+        "9:30 - 10:10": 2,
+        "10:20 - 11:00": 3,
+        "11:00 - 11:40": 4,
+        "11:40 - 12:20": 5,
+        "12:50 - 13:30": 6,
+        "13:30 - 14:10": 7,
+        "14:10 - 14:50": 8,
+        "14:50 - 15:30": 9,
     }
     return period_map.get(time_slot, 0)
 
 
-@app.route('/timetable/save_timetable_to_db', methods=['POST'])
+@app.route("/timetable/save_timetable_to_db", methods=["POST"])
 def save_timetable_to_db():
     """Saves the timetable data from the session to the database."""
-    cls = f.request.form.get('class')
-        # Make sure the user is logged in and there is a timetable in the session
-    if 'user' not in f.session or 'timetable' not in f.session:
-        return f.redirect(f.url_for('login'))
+    cls = f.request.form.get("class")
+    # Make sure the user is logged in and there is a timetable in the session
+    if "user" not in f.session or "timetable" not in f.session:
+        return f.redirect(f.url_for("login"))
 
     cursor = timetabledb.cursor()
-    
+
     # Get the timetable from the session
-    imported_timetable = f.session.get('timetable', [])
+    imported_timetable = f.session.get("timetable", [])
     if not imported_timetable:
         print("No timetable data found in session.", 400)
-    
+
     # Clear existing data for the class to prevent duplicates
     cursor.execute("DELETE FROM periods WHERE classID = ?", (cls,))
 
     # Insert new timetable data
     for period in imported_timetable:
-        db_day = convert_day_to_db(period.get('day'))
-        db_period_no = convert_time_to_periodno(period.get('time'))
-        
+        db_day = convert_day_to_db(period.get("day"))
+        db_period_no = convert_time_to_periodno(period.get("time"))
+
         # Ensure data is valid before insertion
         if not all([db_day, db_period_no]):
             # Skip invalid periods or handle the error as needed
             continue
 
-        teacherid = ''
-        if not period.get('teacherid') :
-            if not period.get('subject') :
-                teacherid = 'na'
-            else :
-                teacherid = period.get('subject')
-        else :
+        teacherid = ""
+        if not period.get("teacherid"):
+            if not period.get("subject"):
+                teacherid = "na"
+            else:
+                teacherid = period.get("subject")
+        else:
             teacherid = period.get(teacherid)
 
         cursor.execute(
             "INSERT INTO periods (classID, day, periodno, subject, teacherid) VALUES (?, ?, ?, ?, ?)",
-            (cls, db_day, db_period_no, period.get('subject'), teacherid)
+            (cls, db_day, db_period_no, period.get("subject"), teacherid),
         )
 
     timetabledb.commit()
-    
-    return f.redirect(f.url_for('view_timetable'))
 
-    
+    return f.redirect(f.url_for("view_timetable"))
 
 
-@app.route('/timetable/get_timetable', methods=['POST'])
+@app.route("/timetable/get_timetable", methods=["POST"])
 def get_timetable_from_db():
     """Retrieves timetable data from the database and stores it in the session."""
-    cls = f.request.form.get('class')
+    cls = f.request.form.get("class")
     timetabledb.row_factory = sql.Row
     timetable_query = """
     SELECT
@@ -474,40 +517,40 @@ def get_timetable_from_db():
     WHERE classID = ?
     ORDER BY day, periodno
     """
-    
+
     cursor = timetabledb.execute(timetable_query, (cls,))
     imported_timetable = []
-    
+
     for row in cursor.fetchall():
-        imported_timetable.append({
-            'day': row['day'],
-            'time': row['time'],
-            'subject': row['teacherid'],
-            'teacher': row['teacherid']
-        })
-    
-    
-    f.session['timetable'] = imported_timetable
-    return f.redirect(f.url_for('view_timetable'))
+        imported_timetable.append(
+            {
+                "day": row["day"],
+                "time": row["time"],
+                "subject": row["teacherid"],
+                "teacher": row["teacherid"],
+            }
+        )
+
+    f.session["timetable"] = imported_timetable
+    return f.redirect(f.url_for("view_timetable"))
 
 
-
-@app.route('/timetable/autosave', methods=['POST'])
+@app.route("/timetable/autosave", methods=["POST"])
 def auto_save_timetable():
     """Handles the automatic saving of the timetable."""
-    if 'user' not in f.session:
-        return f.redirect(f.url_for('login'))
-    cls = ''
+    if "user" not in f.session:
+        return f.redirect(f.url_for("login"))
+    cls = ""
     for key, value in f.request.form.items():
-        if key.startswith('teacher_'):
-            index = key.split('_')[1]
+        if key.startswith("teacher_"):
+            index = key.split("_")[1]
             teacher = value
-            subject = f.request.form.get(f'subject_{index}')
-            num_class = f.request.form.get(f'num_classes_{index}')
-            print(create_assignment(teacher,cls,num_class,subject))
-        elif key.startswith('class_name') :
+            subject = f.request.form.get(f"subject_{index}")
+            num_class = f.request.form.get(f"num_classes_{index}")
+            print(create_assignment(teacher, cls, num_class, subject))
+        elif key.startswith("class_name"):
             cls = value.strip()
-    
+
     print(generate_timetable(cls))
 
     timetabledb.row_factory = sql.Row
@@ -538,31 +581,31 @@ def auto_save_timetable():
     WHERE classID = ?
     ORDER BY day, periodno
     """
-    
+
     cursor = timetabledb.execute(timetable_query, (cls,))
     imported_timetable = []
-    
+
     for row in cursor.fetchall():
-        imported_timetable.append({
-            'day': row['day'],
-            'time': row['time'],
-            'subject': row['subject'],
-            'teacher': row['teacherid']
-        })
-    
-    
+        imported_timetable.append(
+            {
+                "day": row["day"],
+                "time": row["time"],
+                "subject": row["subject"],
+                "teacher": row["teacherid"],
+            }
+        )
+
     print(imported_timetable)
 
     # Store the retrieved data in the session
-    f.session['timetable'] = imported_timetable
+    f.session["timetable"] = imported_timetable
 
-    return f.redirect(f.url_for('view_timetable'))
-    
+    return f.redirect(f.url_for("view_timetable"))
+
     # Redirect to the view timetable page
-   
 
 
-def getTimetables() :
+def getTimetables():
     """Retrieves a list of all unique class IDs from the database.
 
     Returns:
@@ -571,89 +614,114 @@ def getTimetables() :
     query = "SELECT DISTINCT classID from periods"
     cursor = timetabledb.execute(query)
     classes = []
-    for loop in cursor.fetchall() :
+    for loop in cursor.fetchall():
         classes.append(loop[0])
     return classes
 
-#-----------------------------------------------------------------------------------------------------------------------------------
 
-#View timetable
+# -----------------------------------------------------------------------------------------------------------------------------------
 
-@app.route('/timetable/view')
+# View timetable
+
+
+@app.route("/timetable/view")
 def view_timetable():
     """Renders the timetable display page."""
-    if 'user' not in f.session:
-        return f.redirect(f.url_for('login'))
-    timetable_data = f.session.get('timetable', [])
+    if "user" not in f.session:
+        return f.redirect(f.url_for("login"))
+    timetable_data = f.session.get("timetable", [])
     structured_timetable = {}
-    days_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    days_order = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+    ]
 
     for entry in timetable_data:
-        time = entry['time']
-        day = entry['day']
-        subject = entry['subject']
-        teacher = entry['teacher']
+        time = entry["time"]
+        day = entry["day"]
+        subject = entry["subject"]
+        teacher = entry["teacher"]
         if time not in structured_timetable:
             structured_timetable[time] = {}
-        structured_timetable[time][day] = f"{subject} ({teacher})" if teacher else subject
+        structured_timetable[time][day] = (
+            f"{subject} ({teacher})" if teacher else subject
+        )
 
     sorted_timetable = dict(structured_timetable.items())
 
-    return f.render_template('timetable_display.html', timetable_data=sorted_timetable, days_order=days_order)
+    return f.render_template(
+        "timetable_display.html", timetable_data=sorted_timetable, days_order=days_order
+    )
 
-#-----------------------------------------------------------------------------------------------------------------------------------
 
-#Export timetable
+# -----------------------------------------------------------------------------------------------------------------------------------
 
-@app.route('/timetable/export')
+# Export timetable
+
+
+@app.route("/timetable/export")
 def export_timetable():
     """Exports the timetable data from the session to a CSV file."""
-    if 'user' not in f.session:
-        return f.redirect(f.url_for('login'))
-    timetable_data = f.session.get('timetable', [])
+    if "user" not in f.session:
+        return f.redirect(f.url_for("login"))
+    timetable_data = f.session.get("timetable", [])
     if not timetable_data:
         return "No timetable data to export."
 
     si = StringIO()
     writer = csv.writer(si)
-    writer.writerow(['Day', 'Time Slot', 'Subject', 'Teacher'])
+    writer.writerow(["Day", "Time Slot", "Subject", "Teacher"])
 
     for entry in timetable_data:
-        writer.writerow([entry['day'], entry['time'], entry['subject'], entry['teacher']])
+        writer.writerow(
+            [entry["day"], entry["time"], entry["subject"], entry["teacher"]]
+        )
 
     output = si.getvalue().encode("utf-8")
     bio = BytesIO(output)
     bio.seek(0)
 
-    return f.send_file(bio, mimetype='text/csv', as_attachment=True, download_name='timetable.csv')
-#-----------------------------------------------------------------------------------------------------------------------------------
+    return f.send_file(
+        bio, mimetype="text/csv", as_attachment=True, download_name="timetable.csv"
+    )
 
-#Import and export control
 
-@app.route('/timetable/import_export')
+# -----------------------------------------------------------------------------------------------------------------------------------
+
+# Import and export control
+
+
+@app.route("/timetable/import_export")
 def import_export():
     """Renders the import/export control page."""
-    if 'user' not in f.session:
-        return f.redirect(f.url_for('login'))
-    return f.render_template('timetable_import_export.html')
+    if "user" not in f.session:
+        return f.redirect(f.url_for("login"))
+    return f.render_template("timetable_import_export.html")
 
-#-----------------------------------------------------------------------------------------------------------------------------------
 
-#Import timetable
+# -----------------------------------------------------------------------------------------------------------------------------------
 
-@app.route('/timetable/import', methods=['POST'])
+# Import timetable
+
+
+@app.route("/timetable/import", methods=["POST"])
 def import_timetable():
     """Imports timetable data from a CSV file and stores it in the session."""
-    if 'user' not in f.session:
-        return f.redirect(f.url_for('login'))
+    if "user" not in f.session:
+        return f.redirect(f.url_for("login"))
 
-    if 'csv_file' not in f.request.files:
+    if "csv_file" not in f.request.files:
         return "No file part"
-    file = f.request.files['csv_file']
-    if file.filename == '':
+    file = f.request.files["csv_file"]
+    if file.filename == "":
         return "No selected file"
-    if file and file.filename.endswith('.csv'):
-        csv_data = file.stream.read().decode('utf-8')
+    if file and file.filename.endswith(".csv"):
+        csv_data = file.stream.read().decode("utf-8")
         si = StringIO(csv_data)
         reader = csv.reader(si)
         header = next(reader, None)
@@ -662,37 +730,45 @@ def import_timetable():
         for row in reader:
             if len(row) == 4:
                 day, time, subject, teacher = row
-                imported_timetable.append({'day': day, 'time': time, 'subject': subject, 'teacher': teacher})
+                imported_timetable.append(
+                    {"day": day, "time": time, "subject": subject, "teacher": teacher}
+                )
             elif len(row) == 3:
                 day, time, subject = row
-                imported_timetable.append({'day': day, 'time': time, 'subject': subject, 'teacher': ''})
+                imported_timetable.append(
+                    {"day": day, "time": time, "subject": subject, "teacher": ""}
+                )
             else:
                 return "Invalid CSV format: Each row should have 3 or 4 columns (Day, Time Slot, Subject, Teacher)."
 
-        f.session['timetable'] = imported_timetable
-        return f.redirect(f.url_for('view_timetable'))
+        f.session["timetable"] = imported_timetable
+        return f.redirect(f.url_for("view_timetable"))
     else:
         return "Please upload a CSV file."
-    
-@app.route('/timetable/import')
+
+
+@app.route("/timetable/import")
 def timetable_import():
     """Renders the timetable import page."""
-    if 'user' not in f.session:
-        return f.redirect(f.url_for('login'))
-    return f.render_template('timetable_import.html')
+    if "user" not in f.session:
+        return f.redirect(f.url_for("login"))
+    return f.render_template("timetable_import.html")
 
-#-----------------------------------------------------------------------------------------------------------------------------------
 
-#Creators page
+# -----------------------------------------------------------------------------------------------------------------------------------
 
-@app.route('/creators')
+# Creators page
+
+
+@app.route("/creators")
 def the_creators():
     """Renders the creators page."""
-    return f.render_template('creators.html')
+    return f.render_template("creators.html")
 
-#=====================================================================================================================================
-#App run
-#=====================================================================================================================================
 
-if __name__ == '__main__':
-    app.run(debug = True, port = 5005)
+# =====================================================================================================================================
+# App run
+# =====================================================================================================================================
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5005)

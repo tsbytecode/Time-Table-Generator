@@ -60,6 +60,10 @@ h2 {
     font-size: 1.6em;
 }
 
+h4 {
+    margin-top: -1.2em;
+}
+
 form div {
     margin-bottom: 1.5em;
 }
@@ -86,7 +90,7 @@ select {
 }
 
 button {
-    background-color: #DDDDDD;
+    background-color: #CCCCCC;
     color: #333333;
     padding: 8px 15px;
     border: none;
@@ -98,7 +102,8 @@ button {
 }
 
 button:hover {
-    background-color: #CCCCCC;
+    background-color: #AAAAAA;
+    color: #111111;
 }
 
 table {
@@ -139,8 +144,8 @@ footer {
     background-color: #DDDDDD;
     color: #333333;
     border-radius: 8px;
-    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.1);
     font-size: 0.85em;
+    border: 4px solid #CCCCCC;    
 }
 
 .timetable-entry {
@@ -175,9 +180,8 @@ footer {
 }
 
 .timetable-entry button.remove-slot {
-    background-color: #FFCCCC;
-    color: #B00020;
-    border: none;
+    background-color: #FF9999;
+    color: #000000;
     padding: 8px 12px;
     border-radius: 4px;
     cursor: pointer;
@@ -188,7 +192,7 @@ footer {
 }
 
 .timetable-entry button.remove-slot:hover {
-    background-color: #FF9999;
+    background-color: #ff4848;
 }
 
 #add-slot,
@@ -210,7 +214,7 @@ footer {
 }
 
 .sidebar {
-    width: 250px;
+    width: 267px;
     background-color: #FFFFFF;
     color: #333333;
     padding: 10px 0;
@@ -219,7 +223,7 @@ footer {
     overflow-y: auto;
     z-index: 10;
     transition: transform 0.3s ease-in-out;
-    transform: translateX(-203px);
+    transform: translateX(-215px);
     position: fixed;
     top: 0;
     left: 0;

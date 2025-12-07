@@ -5,7 +5,7 @@
     <title>{% block title %}TIMEGEN{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename = 'Styles/style_light.css') }}">
 </head>
-<body>
+<body style="padding-left: 0px;">
     <div class="content">
         <div class="header-container">
             <header class="main-header">
@@ -16,8 +16,7 @@
             {% block content %}{% endblock %}
         </main>
         <footer>
-            <!-- <p><a href="{{ url_for('the_creators') }}" style="color: #F2DFCB; text-decoration: none;">Timetable App by Tushar, Darshan and Raj</a></p> -->
-             <p><a href="{{ url_for('the_creators') }}" style="color: #333333; text-decoration: none;">Timetable App by Tushar, Darshan and Raj</a></p>
+             <p><a href="{{ url_for('the_creators') }}" style="color: #444444; font-size: 18px; text-decoration: none; font-family: Georgia;">Timetable App by Tushar, Darshan and Raj</a></p>
         </footer>
     </div>
     <div class="overlay"></div>

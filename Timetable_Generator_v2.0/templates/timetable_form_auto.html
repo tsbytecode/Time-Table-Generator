@@ -3,88 +3,118 @@
 {% block title %}Assign Teachers to Class{% endblock %}
 
 {% block content %}
-    <h2>Assign Teachers to Class</h2>
-    <form method="POST" id="assignment-form" action="{{ url_for('auto_save_timetable') }}">
-        <div class="form-group">
-            <label for="class_name">Class:</label>
-            <input type="text" name="class_name" id="class_name" required>
+<h2>Assign Teachers to Class</h2>
+<form method="POST" id="assignment-form" action="{{ url_for('auto_save_timetable') }}">
+    <div class="form-group">
+        <label for="class_name">Class:</label>
+        <input type="text" name="class_name" id="class_name" required>
+    </div>
+
+    <hr>
+
+    <div id="teacher-assignments">
+        {% if assignments %}
+        {% for assignment in assignments %}
+        <div class="timetable-entry">
+            <label for="teacher_{{ loop.index0 }}">Teacher:</label>
+            <input type="text" name="teacher_{{ loop.index0 }}" id="teacher_{{ loop.index0 }}"
+                value="{{ assignment.teacher }}" required>
+
+            <label for="num_classes_{{ loop.index0 }}">Number of Classes:</label>
+            <input type="number" name="num_classes_{{ loop.index0 }}" id="num_classes_{{ loop.index0 }}"
+                value="{{ assignment.num_classes }}" min="1" required>
+
+            <button type="button" class="remove-slot">Delete</button>
         </div>
-        
-        <hr>
+        {% endfor %}
+        {% else %}
+        <div class="timetable-entry">
+            <label for="teacher_0">Teacher:</label>
+            <input type="text" name="teacher_0" id="teacher_0" required>
 
-        <div id="teacher-assignments">
-            {% if assignments %}
-                {% for assignment in assignments %}
-                    <div class="timetable-entry">
-                        <label for="teacher_{{ loop.index0 }}">Teacher:</label>
-                        <input type="text" name="teacher_{{ loop.index0 }}" id="teacher_{{ loop.index0 }}" value="{{ assignment.teacher }}" required>
-                        
-                        <label for="num_classes_{{ loop.index0 }}">Number of Classes:</label>
-                        <input type="number" name="num_classes_{{ loop.index0 }}" id="num_classes_{{ loop.index0 }}" value="{{ assignment.num_classes }}" min="1" required>
+            <label for="subject_0">Subject:</label>
+            <select name="subject_0" id="subject_0">
+                <option value="">Select Subject</option>
+                <option value="Math">Math</option>
+                <option value="Chemistry">Chemistry</option>
+                <option value="Physics">Physics</option>
+                <option value="Biology">Biology</option>
+                <option value="English">English</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Art">Art</option>
+                <option value="Dance">Dance</option>
+                <option value="Music">Music</option>
+                <option value="Sports">Sports</option>
+                <option value="Volleyball">Volleyball</option>
+                <option value="MSA">MSA</option>
+            </select>
+            <label for="num_classes_0">Number of Classes:</label>
+            <input type="number" name="num_classes_0" id="num_classes_0" min="1" style="padding: 7px;" required>
 
-                        <button type="button" class="remove-slot">Delete</button>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <div class="timetable-entry">
-                    <label for="teacher_0">Teacher:</label>
-                    <input type="text" name="teacher_0" id="teacher_0" required>
-                    
-                    <label for="subject_0">Subject:</label>
-                    <input type="text" name="subject_0" id="subject_0" required>
-
-                    <label for="num_classes_0">Number of Classes:</label>
-                    <input type="number" name="num_classes_0" id="num_classes_0" min="1" required>
-
-                    <button type="button" class="remove-slot">Delete</button>
-                </div>
-            {% endif %}
+            <button type="button" class="remove-slot">Delete</button>
         </div>
+        {% endif %}
+    </div>
 
-        <button type="button" id="add-assignment">Add Teacher</button>
-        <button type="submit">Save Assignments</button>
-    </form>
+    <button type="button" id="add-assignment">Add Teacher</button>
+    <button type="submit">Save Assignments</button>
+</form>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const addAssignmentButton = document.getElementById('add-assignment');
-            const teacherAssignments = document.getElementById('teacher-assignments');
-            let counter = teacherAssignments.children.length;
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addAssignmentButton = document.getElementById('add-assignment');
+        const teacherAssignments = document.getElementById('teacher-assignments');
+        let counter = teacherAssignments.children.length;
 
-            addAssignmentButton.addEventListener('click', function() {
-                const newEntry = document.createElement('div');
-                newEntry.classList.add('timetable-entry');
-                newEntry.innerHTML = `
+        addAssignmentButton.addEventListener('click', function () {
+            const newEntry = document.createElement('div');
+            newEntry.classList.add('timetable-entry');
+            newEntry.innerHTML = `
                     <label for="teacher_${counter}">Teacher:</label>
                     <input type="text" name="teacher_${counter}" id="teacher_${counter}" required>
                     
                     <label for="subject_${counter}">Subject:</label>
-                    <input type="text" name="subject_${counter}" id="subject_${counter}" required>
+                    <select name="subject_${counter}" id="subject_${counter}">
+                        <option value="">Select Subject</option>
+                        <option value="Math">Math</option>
+                        <option value="Chemistry">Chemistry</option>
+                        <option value="Physics">Physics</option>
+                        <option value="Biology">Biology</option>
+                        <option value="English">English</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Art">Art</option>
+                        <option value="Dance">Dance</option>
+                        <option value="Music">Music</option>
+                        <option value="Sports">Sports</option>
+                        <option value="Volleyball">Volleyball</option>
+                        <option value="MSA">MSA</option>
+                    </select>
+
                     
 
                     <label for="num_classes_${counter}">Number of Classes:</label>
-                    <input type="number" name="num_classes_${counter}" id="num_classes_${counter}" min="1" required>
+                    <input type="number" name="num_classes_${counter}" id="num_classes_${counter}" min="1" style="padding: 7px;" required>
 
                     <button type="button" class="remove-slot">Delete</button>
                 `;
-                teacherAssignments.appendChild(newEntry);
-                counter++;
-            });
+            teacherAssignments.appendChild(newEntry);
+            counter++;
+        });
 
-            teacherAssignments.addEventListener('click', function(event) {
-                if (event.target.classList.contains('remove-slot')) {
-                    event.target.parentNode.remove();
-                }
-            });
+        teacherAssignments.addEventListener('click', function (event) {
+            if (event.target.classList.contains('remove-slot')) {
+                event.target.parentNode.remove();
+            }
+        });
 
-            document.querySelector('#assignment-form').addEventListener('submit', function() {
-                const entries = document.querySelectorAll('.timetable-entry');
-                entries.forEach((entry, index) => {
-                    entry.querySelector('input[name^="teacher_"]').name = `teacher_${index}`;
-                    entry.querySelector('input[name^="subject_"]').name = `subject_${index}`;
-                    entry.querySelector('input[name^="num_classes_"]').name = `num_classes_${index}`;
-                });
+        document.querySelector('#assignment-form').addEventListener('submit', function () {
+            const entries = document.querySelectorAll('.timetable-entry');
+            entries.forEach((entry, index) => {
+                entry.querySelector('input[name^="teacher_"]').name = `teacher_${index}`;
+                entry.querySelector('input[name^="subject_"]').name = `subject_${index}`;
+                entry.querySelector('input[name^="num_classes_"]').name = `num_classes_${index}`;
             });
         });
-    </script>
+    });
+</script>
 {% endblock %}

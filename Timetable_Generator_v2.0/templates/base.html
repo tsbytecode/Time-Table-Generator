@@ -24,11 +24,11 @@
         <br>
         {% if session['user'] %}
             <p class="user-info">Logged in as: {{ session['user'] }}</p>
-            <form method="GET" action="{{ url_for('logout') }}" style="margin-left: 10px;">
+            <form method="GET" action="{{ url_for('logout') }}">
                 <button type="submit">Logout</button>
             </form>
         {% else %}
-            <form method="GET" action="{{ url_for('login') }}" style="margin-left: 10px;">
+            <form method="GET" action="{{ url_for('login') }}">
                 <button type="submit">Login</button>
             </form>
         {% endif %}
@@ -43,8 +43,7 @@
             {% block content %}{% endblock %}
         </main>
         <footer>
-            <!-- <p><a href="{{ url_for('the_creators') }}" style="color: #F2DFCB; text-decoration: none;">Timetable App by Tushar, Darshan and Raj</a></p> -->
-             <p><a href="{{ url_for('the_creators') }}" style="color: #333333; text-decoration: none;">Timetable App by Tushar, Darshan and Raj</a></p>
+             <p><a href="{{ url_for('the_creators') }}" style="color: #444444; font-size: 18px; text-decoration: none; font-family: Georgia;">Timetable App by Tushar, Darshan and Raj</a></p>
         </footer>
     </div>
     <div class="overlay"></div>

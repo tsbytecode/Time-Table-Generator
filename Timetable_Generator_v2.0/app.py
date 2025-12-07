@@ -157,9 +157,9 @@ def login():
                     f.session['user'] = username
                     return f.redirect(f.url_for('create_timetable'))
                 else:
-                    return f.render_template('login.html', login_error = "Incorrect password.")
+                    return f.render_template('login.html', login_error = "Incorrect Password")
             else:
-                return f.render_template('login.html', login_error = "User does not exist.")
+                return f.render_template('login.html', login_error = "User does not exist")
         return f.render_template('login.html')
     else:
         return f.redirect(f.url_for('create_timetable'))
@@ -446,7 +446,8 @@ def auto_save_timetable():
             WHEN 8 THEN '14:10 - 14:50'
             WHEN 9 THEN '14:50 - 15:30'
         END AS time,
-        teacherid
+        teacherid,
+        subject
     FROM periods
     WHERE classID = ?
     ORDER BY day, periodno
@@ -459,7 +460,7 @@ def auto_save_timetable():
         imported_timetable.append({
             'day': row['day'],
             'time': row['time'],
-            'subject': row['teacherid'],
+            'subject': row['subject'],
             'teacher': row['teacherid']
         })
     

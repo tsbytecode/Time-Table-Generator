@@ -6,12 +6,22 @@ import (
 	_ "github.com/glebarez/go-sqlite"
 )
 
+// DBconn represents a connection to the SQLite database.
 type DBconn struct {
 	conn     *sql.DB
 	path     string
 	isMemory bool
 }
 
+// NewDBconn creates a new database connection.
+//
+// Parameters:
+//   isMemory: A boolean indicating whether to use an in-memory database.
+//   path: The path to the database file if not an in-memory database.
+//
+// Returns:
+//   *DBconn: A pointer to the DBconn struct.
+//   error: An error if the connection fails.
 func NewDBconn(isMemory bool, path string) (*DBconn, error) {
 	d := DBconn{}
 	d.isMemory = isMemory
@@ -44,10 +54,12 @@ func NewDBconn(isMemory bool, path string) (*DBconn, error) {
 	return &d, err
 }
 
+// Close closes the database connection.
 func (d *DBconn) Close() {
 	d.conn.Close()
 }
 
+// Assignment represents a teaching assignment.
 type Assignment struct {
 	TeacherID     string
 	ClassID       string
@@ -56,6 +68,16 @@ type Assignment struct {
 	periodsused   int
 }
 
+// getPossibleAssignments retrieves a list of possible assignments for a given class, period, and date.
+//
+// Parameters:
+//   classID: The ID of the class.
+//   periodno: The period number.
+//   date: The date.
+//
+// Returns:
+//   []Assignment: A slice of possible assignments.
+//   error: An error if the query fails.
 func (d *DBconn) getPossibleAssignments(classID string, periodno int, date string) ([]Assignment, error) {
 	rows, err := d.conn.Query("SELECT * FROM assignments WHERE classid = ? AND periodsused != periodsneeded ORDER BY periodsused", classID)
 	if err != nil {
@@ -85,27 +107,56 @@ func (d *DBconn) getPossibleAssignments(classID string, periodno int, date strin
 	return assignments, nil
 }
 
+// NewAssignments adds a new assignment to the database.
+//
+// Parameters:
+//   d: A pointer to the DBconn struct.
+//
+// Returns:
+//   error: An error if the insertion fails.
 func (a *Assignment) NewAssignments(d *DBconn) error {
 	_, err := d.conn.Exec("INSERT INTO assignments (teacherid, classid, periodsneeded, subject, periodsused) VALUES (?, ?, ?, ?, ?)", a.TeacherID, a.ClassID, a.Periodsneeded, a.Subject, int(0))
 	return err
 }
 
+// IncrementAssignments increments the number of periods used for an assignment.
+//
+// Parameters:
+//   d: A pointer to the DBconn struct.
+//
+// Returns:
+//   error: An error if the update fails.
 func (a *Assignment) IncrementAssignments(d *DBconn) error {
 	_, err := d.conn.Exec("UPDATE assignments SET periodsused = periodsused + 1 WHERE classid = ? AND teacherID = ?", a.ClassID, a.TeacherID)
 	return err
 }
 
+// DecrementAssignments decrements the number of periods used for an assignment.
+//
+// Parameters:
+//   d: A pointer to the DBconn struct.
+//
+// Returns:
+//   error: An error if the update fails.
 func (a *Assignment) DecrementAssignments(d *DBconn) error {
 	_, err := d.conn.Exec("UPDATE assignments SET periodsused = periodsused - 1 WHERE classid = ? AND teacherID = ?", a.TeacherID, a.ClassID)
 	return err
 }
 
+// period represents a single period in the timetable.
 type period struct {
 	a        *Assignment
 	Periodno int
 	Day      string
 }
 
+// NewPeriod adds a new period to the database.
+//
+// Parameters:
+//   d: A pointer to the DBconn struct.
+//
+// Returns:
+//   error: An error if the insertion fails.
 func (p *period) NewPeriod(d *DBconn) error {
 	_, err := d.conn.Exec("INSERT INTO periods (teacherid, Classid, periodno, day, subject) VALUES (?,?,?,?,?)", p.a.TeacherID, p.a.ClassID, p.Periodno, p.Day, p.a.Subject)
 	if err == nil {
@@ -114,6 +165,13 @@ func (p *period) NewPeriod(d *DBconn) error {
 	return err
 }
 
+// RemovePeriod removes a period from the database.
+//
+// Parameters:
+//   d: A pointer to the DBconn struct.
+//
+// Returns:
+//   error: An error if the deletion fails.
 func (p *period) RemovePeriod(d *DBconn) error {
 	_, err := d.conn.Exec("DELETE FROM periods WHERE classid = ? AND periodno = ? AND day = ?", p.a.ClassID, p.Periodno, p.Day)
 	if err == nil {
@@ -122,10 +180,21 @@ func (p *period) RemovePeriod(d *DBconn) error {
 	return err
 }
 
+// GenerateTimetable generates a timetable for all classes.
+//
+// Parameters:
+//   d: A pointer to the DBconn struct.
 func GenerateTimetable(d *DBconn) {
 
 }
 
+// GenerateClass generates a timetable for a specific class.
+//
+// Parameters:
+//   classID: The ID of the class.
+//
+// Returns:
+//   bool: True if the timetable was generated successfully, false otherwise.
 func (d *DBconn) GenerateClass(classID string) bool {
 	_, err := d.conn.Exec("DELETE FROM periods WHERE classid = ?", classID)
 	if err != nil {
@@ -134,6 +203,16 @@ func (d *DBconn) GenerateClass(classID string) bool {
 	return d.Assignperiod(classID, "mon", 1, false)
 }
 
+// Assignperiod recursively assigns periods for a class.
+//
+// Parameters:
+//   classID: The ID of the class.
+//   day: The day of the week.
+//   periodNo: The period number.
+//   islast: A boolean indicating whether this is the last period.
+//
+// Returns:
+//   bool: True if the period was assigned successfully, false otherwise.
 func (d *DBconn) Assignperiod(classID string, day string, periodNo int, islast bool) bool {
 	a, err := d.getPossibleAssignments(classID, periodNo, day)
 	if err != nil {
@@ -176,6 +255,16 @@ func (d *DBconn) Assignperiod(classID string, day string, periodNo int, islast b
 
 }
 
+// next calculates the next day and period number.
+//
+// Parameters:
+//   day: The current day.
+//   periodno: The current period number.
+//
+// Returns:
+//   string: The next day.
+//   int: The next period number.
+//   bool: True if this is the last period of the week.
 func next(day string, periodno int) (string, int, bool) {
 	days := []string{"mon", "tue", "wed", "thu", "fri"}
 	if periodno == 9 {
